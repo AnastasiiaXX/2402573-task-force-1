@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 enum Status: string
 {
     case New = 'New';
@@ -21,28 +23,30 @@ class Task
 {
     public int $workerId = 0;
     public int $clientId = 0;
-    public Status $currentStatus;
-
-    private array $statuses = [
-        Status::New->value => 'Новое',
-        Status::Canceled->value => 'Отменено',
-        Status::InProgress->value => 'В работе',
-        Status::Completed->value => 'Выполнено',
-        Status::Failed->value => 'Провалено'
-    ];
-
-    private array $actions = [
-        Action::Cancel->value => 'Отменить',
-        Action::Respond->value => 'Откликнуться',
-        Action::Decline->value => 'Отказаться',
-        Action::Complete->value => 'Завершить'
-    ];
+    private Status $currentStatus;
+    private array $statuses;
+    private array $actions;
 
     public function __construct(int $workerId, int $clientId)
     {
         $this->workerId = $workerId;
         $this->clientId = $clientId;
         $this->currentStatus = Status::New;
+
+        $this->statuses = [
+            Status::New->value => 'Новое',
+            Status::Canceled->value => 'Отменено',
+            Status::InProgress->value => 'В работе',
+            Status::Completed->value => 'Выполнено',
+            Status::Failed->value => 'Провалено',
+        ];
+
+        $this->actions = [
+            Action::Cancel->value => 'Отменить',
+            Action::Respond->value => 'Откликнуться',
+            Action::Decline->value => 'Отказаться',
+            Action::Complete->value => 'Завершить',
+        ];
     }
 
     public function getAllStatuses(): array
@@ -67,7 +71,7 @@ class Task
 
     public function getNextStatus(Action $action): ?Status
     {
-        switch($action) {
+        switch ($action) {
             case Action::Cancel:
                 return Status::Canceled;
             case Action::Respond:
@@ -83,7 +87,7 @@ class Task
 
     public function getAvailableAction(Status $status): array
     {
-        switch($status) {
+        switch ($status) {
             case Status::New:
                 return [Action::Cancel, Action::Respond];
             case Status::InProgress:
@@ -91,5 +95,10 @@ class Task
             default:
                 return [];
         }
+    }
+
+    public function getCurrentStatus()
+    {
+        return $this->currentStatus;
     }
 }
