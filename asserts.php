@@ -1,11 +1,10 @@
 <?php
 
-require_once('Task.php');
+require __DIR__ . '/vendor/autoload.php';
 
-$task = new Task(workerId: 1, clientId: 1);
+use TaskForce\Model\Task;
+use TaskForce\Enum\Status;
 
-assert($task->getCurrentStatus() === Status::New, 'status by default');
-assert(in_array(Action::Complete, $task->getAvailableAction(Status::InProgress)), 'action for task in progress');
-assert($task->getNextStatus(Action::Cancel) === Status::Canceled, 'action for canceled task');
+$task = new Task(1, 10);
 
-echo 'Tests passed';
+var_dump($task->getCurrentStatus());

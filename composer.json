@@ -1,0 +1,16 @@
+{
+    "name": "anastasiia/2402573-task-force-1",
+    "description": "Online place to find a professional for your task",
+    "autoload": {
+        "psr-4": {
+            "TaskForce\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Anastasiia",
+            "email": "bjko.smsng@gmail.com"
+        }
+    ],
+    "require": {}
+}
