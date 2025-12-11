@@ -12,9 +12,6 @@ class Task
     public int $workerId = 0;
     public int $clientId = 0;
     private Status $currentStatus;
-    private array $statuses;
-    private array $actions;
-
 
     /**
      * Task constructor.
@@ -26,22 +23,7 @@ class Task
     {
         $this->workerId = $workerId;
         $this->clientId = $clientId;
-        $this->currentStatus = Status::New;
-
-        $this->statuses = [
-            Status::New->value => 'Новое',
-            Status::Canceled->value => 'Отменено',
-            Status::InProgress->value => 'В работе',
-            Status::Completed->value => 'Выполнено',
-            Status::Failed->value => 'Провалено',
-        ];
-
-        $this->actions = [
-            Action::Cancel->value => 'Отменить',
-            Action::Respond->value => 'Откликнуться',
-            Action::Decline->value => 'Отказаться',
-            Action::Complete->value => 'Завершить',
-        ];
+        $this->currentStatus = Status::NEW;
     }
 
     /**
@@ -55,16 +37,6 @@ class Task
     }
 
     /**
-     * Возвращает карту статусов (для отображения)
-     *
-     * @return array
-     */
-    public function getStatusesMap(): array
-    {
-        return $this->statuses;
-    }
-
-    /**
      * Возвращает массив всех действий
      *
      * @return Action[]
@@ -72,16 +44,6 @@ class Task
     public function getAllActions(): array
     {
         return Action::cases();
-    }
-
-    /**
-     * Возвращает карту всех действий
-     *
-     * @return array
-     */
-    public function getActionsMap(): array
-    {
-        return $this->actions;
     }
 
     /**
@@ -94,14 +56,14 @@ class Task
     public function getNextStatus(Action $action): ?Status
     {
         switch ($action) {
-            case Action::Cancel:
-                return Status::Canceled;
-            case Action::Respond:
-                return Status::InProgress;
-            case Action::Complete:
-                return Status::Completed;
-            case Action::Decline:
-                return Status::Failed;
+            case Action::CANCEL:
+                return Status::CANCELED;
+            case Action::RESPOND:
+                return Status::INPROGRESS;
+            case Action::COMPLETE:
+                return Status::COMPLETED;
+            case Action::DECLINE:
+                return Status::FAILED;
             default:
                 return null;
         }
@@ -117,10 +79,10 @@ class Task
     public function getAvailableAction(Status $status): array
     {
         switch ($status) {
-            case Status::New:
-                return [Action::Cancel, Action::Respond];
-            case Status::InProgress:
-                return [Action::Complete, Action::Decline];
+            case Status::NEW:
+                return [Action::CANCEL, Action::RESPOND];
+            case Status::INPROGRESS:
+                return [Action::COMPLETE, Action::DECLINE];
             default:
                 return [];
         }
