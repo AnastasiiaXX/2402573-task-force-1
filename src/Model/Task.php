@@ -10,6 +10,7 @@ use TaskForce\Action\Cancel;
 use TaskForce\Action\Complete;
 use TaskForce\Action\Decline;
 use TaskForce\Action\Respond;
+use TaskForce\Exception\TaskException;
 
 class Task
 {
@@ -25,6 +26,10 @@ class Task
      */
     public function __construct(int $workerId, int $clientId)
     {
+        if ($workerId <= 0 || $clientId <= 0) {
+            throw new TaskException('User ID must be a positive integer');
+        }
+
         $this->workerId = $workerId;
         $this->clientId = $clientId;
         $this->currentStatus = Status::NEW;
@@ -71,6 +76,9 @@ class Task
      */
     public function getAvailableAction(Status $status, int $userId): array
     {
+        if($userId <= 0) {
+            throw new TaskException('User ID must be a positive integer');
+        }
         switch ($status) {
             case Status::NEW:
                 $actions = [new Cancel(), new Respond()];
