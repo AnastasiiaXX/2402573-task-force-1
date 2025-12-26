@@ -3,6 +3,7 @@
 /** @var app\models\Task[] $tasks */
 
 use yii\widgets\LinkPager;
+use yii\helpers\Url;
 ?>
 
 <main class="main-content container">
@@ -12,7 +13,7 @@ use yii\widgets\LinkPager;
   <?php foreach ($tasks as $task): ?>
     <div class="task-card">
       <div class="header-task">
-        <a href="#" class="link link--block link--big">
+        <a href="<?= Url::to(['tasks/view', 'id' => $task->id]) ?>" class="link link--block link--big">
           <?= htmlspecialchars($task->title) ?>
         </a>
         <p class="price price--task">

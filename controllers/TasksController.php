@@ -1,5 +1,4 @@
 <?php
-
 namespace app\controllers;
 
 use Yii;
@@ -8,6 +7,7 @@ use app\models\Task;
 use app\models\TaskFilter;
 use app\models\Category;
 use yii\data\Pagination;
+use yii\web\NotFoundHttpException;
 
 class TasksController extends Controller
 {
@@ -59,5 +59,15 @@ class TasksController extends Controller
       'filters' => $filters,
       'pages' => $pages
     ]);
+  }
+
+  public function actionView($id)
+  {
+    $task = Task::findOne($id);
+    if (!$task) {
+      throw new NotFoundHttpException('Задача не найдена');
+    }
+
+    return $this->render('view', ['task' => $task]);
   }
 }
