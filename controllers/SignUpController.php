@@ -11,6 +11,10 @@ class SignUpController extends Controller
 {
   public function actionIndex() {
 
+     if (!Yii::$app->user->isGuest) {
+            return $this->redirect(['/']);
+    }
+
     $form = new SignUpForm();
     $citiesList = Location::find()
                   ->select(['name', 'id'])
