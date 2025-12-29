@@ -13,6 +13,11 @@ class TasksController extends Controller
 {
   public function actionIndex()
   {
+
+     if (Yii::$app->user->isGuest) {
+      return $this->redirect(['/']);
+    }
+
     $query = Task::find()
       ->where(['status' => Task::STATUS_NEW])
       ->orderBy(['date_add' => SORT_DESC]);

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "users".
@@ -27,9 +28,32 @@ use Yii;
  * @property Tasks[] $tasks
  * @property Tasks[] $tasks0
  */
-class User extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
+    public static function findIdentity($id)
+    {
+        return self::findOne($id);
+    }
 
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        // TODO: Implement findIdentityByAccessToken() method.
+    }
+
+    public function getId()
+    {
+      return $this->getPrimaryKey();
+    }
+
+    public function getAuthKey()
+    {
+      return null;
+    }
+
+    public function validateAuthKey($authKey)
+    {
+      return true;
+    }
 
     /**
      * {@inheritdoc}

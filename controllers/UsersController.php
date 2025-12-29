@@ -19,4 +19,10 @@ class UsersController extends Controller
 
     return $this->render('view', ['user' => $user]);
   }
+
+  public function actionLogout() {
+        \Yii::$app->user->logout();
+
+        return $this->redirect(['/']);
+  }
 }
