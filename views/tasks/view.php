@@ -1,6 +1,12 @@
 <?php
 
 use yii\helpers\Url;
+use app\models\Task;
+use app\models\Response;
+use yii\widgets\ActiveForm;
+
+$currentUserId = Yii::$app->user->isGuest ? null : (int)Yii::$app->user->id;
+
 ?>
 
 <main class="main-content container">
@@ -11,64 +17,75 @@ use yii\helpers\Url;
     </div>
     <p class="task-description">
       <?= htmlspecialchars($task->description) ?>
-      <a href="#" class="button button--blue action-btn" data-action="act_response">Откликнуться на задание</a>
-      <a href="#" class="button button--orange action-btn" data-action="refusal">Отказаться от задания</a>
-      <a href="#" class="button button--pink action-btn" data-action="completion">Завершить задание</a>
+      <?php if (
+        !Yii::$app->user->isGuest &&
+        $isWorker &&
+        !$alreadyResponded &&
+        $task->status === Task::STATUS_NEW
+      ):
+      ?>
+        <a href="#" class="button button--blue action-btn" data-action="act_response">Откликнуться на задание</a>
+      <?php endif; ?>
+      <?php
+      if (
+        $isWorker &&
+        $task->status === Task::STATUS_IN_PROGRESS &&
+        (int)$task->worker_id === (int)Yii::$app->user->id
+      ):
+      ?>
+        <a href="#" class="button button--orange action-btn" data-action="refusal">Отказаться от задания</a>
+      <?php endif; ?>
+      <?php if ($isCustomer &&  $task->status === Task::STATUS_IN_PROGRESS): ?>
+        <a href="#" class="button button--pink action-btn" data-action="completion">Завершить задание</a>
+      <?php endif; ?>
     <div class="task-map">
       <img class="map" src="img/map.png" width="725" height="346" alt="Новый арбат, 23, к. 1">
       <p class="map-address town">Москва</p>
       <p class="map-address">Новый арбат, 23, к. 1</p>
     </div>
+        <?php if (!$isGuest && empty($responses)): ?>
     <h4 class="head-regular">Отклики на задание</h4>
-    <div class="response-card">
-      <img class="customer-photo" src="img/man-glasses.png" width="146" height="156" alt="Фото заказчиков">
-      <div class="feedback-wrapper">
-        <a href="#" class="link link--block link--big">Астахов Павел</a>
-        <div class="response-wrapper">
-          <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
-          <p class="reviews">2 отзыва</p>
-        </div>
-        <p class="response-message">
-          Могу сделать всё в лучшем виде. У меня есть необходимый опыт и инструменты.
-        </p>
-
-      </div>
-      <div class="feedback-wrapper">
-        <p class="info-text"><span class="current-time">25 минут </span>назад</p>
-        <p class="price price--small">3700 ₽</p>
-      </div>
-      <div class="button-popup">
-        <a href="#" class="button button--blue button--small">Принять</a>
-        <a href="#" class="button button--orange button--small">Отказать</a>
-      </div>
-    </div>
-    <div class="response-card">
-      <img class="customer-photo" src="img/man-sweater.png" width="146" height="156" alt="Фото заказчиков">
-      <div class="feedback-wrapper">
-        <?php if ($task->worker): ?>
-          <a href="<?= Url::to(['users/view', 'id' => $task->worker_id]) ?>" class="link link--block link--big">
-            <?= htmlspecialchars($task->worker->name) ?>
-          </a>
-        <?php endif; ?>
-        <div class="response-wrapper">
-          <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
-          <p class="reviews">8 отзывов</p>
-        </div>
-        <p class="response-message">
-          Примусь за выполнение задания в течение часа, сделаю быстро и качественно.
-        </p>
-
-      </div>
-      <div class="feedback-wrapper">
-        <p class="info-text"><span class="current-time">2 часа </span>назад</p>
-        <p class="price price--small">1999 ₽</p>
-      </div>
-      <div class="button-popup">
-        <a href="#" class="button button--blue button--small">Принять</a>
-        <a href="#" class="button button--orange button--small">Отказать</a>
-      </div>
-    </div>
-  </div>
+      <p>Пока нет откликов</p>
+    <?php else: ?>
+      <?php foreach ($responses as $response): ?>
+        <div class="response-card">
+          <img class="customer-photo" src="img/man-sweater.png" width="146" height="156" alt="Фото заказчиков">
+          <div class="feedback-wrapper">
+            <a href="<?= Url::to(['users/view', 'id' => $response->worker_id]) ?>"
+              class="link link--block link--big">
+              <?= htmlspecialchars($response->worker->name) ?>
+            </a>
+            <div class="response-wrapper">
+              <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
+              <p class="reviews">8 отзывов</p>
+            </div>
+            <p class="response-message">
+              <?= htmlspecialchars($response->comment) ?>
+            </p>
+          </div>
+          <div class="feedback-wrapper">
+            <p class="info-text">
+              <?= Yii::$app->formatter->asRelativeTime($response->date_add) ?>
+            </p>
+            <p class="price price--small"><?= (int)$response->cost ?> ₽</p>
+          </div>
+          <?php if (
+            $isCustomer &&
+            $task->status === Task::STATUS_NEW &&
+            $response->status === Response::STATUS_NEW
+          ): ?>
+            <div class="button-popup">
+              <a href="<?= Url::to(['response/accept', 'id' => $response->id]) ?>" class="button button--blue button--small">
+                Принять
+              </a>
+              <a href="<?= Url::to(['response/reject', 'id' => $response->id]) ?>" class="button button--orange button--small">
+                Отказать
+              </a>
+            </div>
+      <?php endif ?>
+    <?php endforeach ?>
+  <?php endif; ?>
+          </div>
   <div class="right-column">
     <div class="right-card black info-card">
       <h4 class="head-card">Информация о задании</h4>
@@ -106,7 +123,9 @@ use yii\helpers\Url;
       Вы собираетесь отказаться от выполнения этого задания.<br>
       Это действие плохо скажется на вашем рейтинге и увеличит счетчик проваленных заданий.
     </p>
-    <a class="button button--pop-up button--orange">Отказаться</a>
+
+    <a href="<?= Url::to(['tasks/decline', 'id' => $task->id]) ?>"
+      class="button button--pop-up button--orange">Отказаться</a>
     <div class="button-container">
       <button class="button--close" type="button">Закрыть окно</button>
     </div>
@@ -119,16 +138,22 @@ use yii\helpers\Url;
       Вы собираетесь отметить это задание как выполненное.
       Пожалуйста, оставьте отзыв об исполнителе и отметьте отдельно, если возникли проблемы.
     </p>
-    <div class="completion-form pop-up--form regular-form">
-      <form>
-        <div class="form-group">
-          <label class="control-label" for="completion-comment">Ваш комментарий</label>
-          <textarea id="completion-comment"></textarea>
-        </div>
-        <p class="completion-head control-label">Оценка работы</p>
-        <div class="stars-rating big active-stars"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div>
-        <input type="submit" class="button button--pop-up button--blue" value="Завершить">
-      </form>
+   <div class="completion-form pop-up--form regular-form">
+      <?php $form = ActiveForm::begin([
+        'action' => ['tasks/complete', 'id' => $task->id],
+        'method' => 'post'
+      ]); ?>
+      <div class="form-group">
+        <?= $form->field($review, 'text')->textarea() ?>
+      </div>
+      <p class="completion-head control-label">Оценка работы</p>
+      <?= $form->field($review, 'score')
+        ->hiddenInput()->label(false) ?>
+      <div class="stars-rating big active-stars"></div>
+      <?= $form->errorSummary($review) ?>
+      <button type="submit" class="button button--pop-up button--blue">Завершить</button>
+
+      <?php ActiveForm::end(); ?>
     </div>
     <div class="button-container">
       <button class="button--close" type="button">Закрыть окно</button>
@@ -143,17 +168,19 @@ use yii\helpers\Url;
       Пожалуйста, укажите стоимость работы и добавьте комментарий, если необходимо.
     </p>
     <div class="addition-form pop-up--form regular-form">
-      <form>
-        <div class="form-group">
-          <label class="control-label" for="addition-comment">Ваш комментарий</label>
-          <textarea id="addition-comment"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="control-label" for="addition-price">Стоимость</label>
-          <input id="addition-price" type="text">
-        </div>
-        <input type="submit" class="button button--pop-up button--blue" value="Завершить">
-      </form>
+      <?php $form = ActiveForm::begin([
+        'action' => ['response/create', 'taskId' => $task->id],
+        'method' => 'post'
+      ]); ?>
+      <div class="form-group">
+        <?= $form->field($response, 'comment')->textarea() ?>
+      </div>
+      <div class="form-group">
+        <?= $form->field($response, 'cost')->input('number', ['min' => 1]) ?>
+      </div>
+      <?= $form->errorSummary($response) ?>
+      <button type="submit" class="button button--pop-up button--blue">Отправить</button>
+      <?php ActiveForm::end(); ?>
     </div>
     <div class="button-container">
       <button class="button--close" type="button">Закрыть окно</button>

@@ -20,6 +20,8 @@ use yii\web\IdentityInterface;
  * @property string|null $about
  * @property int $location_id
  * @property int|null $specialty_id
+ * @property int $failed_tasks
+
  *
  * @property Locations $location
  * @property Responses[] $responses
