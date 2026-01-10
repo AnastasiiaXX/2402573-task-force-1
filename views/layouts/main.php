@@ -17,6 +17,7 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
 $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
 $this->registerCssFile(Yii::getAlias('@web/css/normalize.css'));
 $this->registerCssFile(Yii::getAlias('@web/css/landing.css'));
+$this->registerJsFile(Yii::getAlias('@web/js/main.js'), ['depends' => [\yii\web\JqueryAsset::class]]);
 $this->registerJsFile(Yii::getAlias('@web/js/landing.js'), ['depends' => [\yii\web\JqueryAsset::class]]);
 
 $user = Yii::$app->user->identity ?? null;

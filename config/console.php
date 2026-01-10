@@ -14,6 +14,9 @@ $config = [
     '@tests' => '@app/tests',
   ],
   'components' => [
+    'authManager' => [
+      'class' => yii\rbac\DbManager::class,
+    ],
     'cache' => [
       'class' => 'yii\caching\FileCache',
     ],
@@ -35,7 +38,7 @@ $config = [
       'fixtureDataPath' => '@app/fixtures/data',
       'namespace' => 'app\fixtures',
     ],
-  ],  
+  ],
 ];
 
 if (YII_ENV_DEV) {
