@@ -33,3 +33,10 @@ tests/_support/_generated
 /.vagrant
 
 /config/db.php
+
+.env
+.env.*
+
+.docker/log/*
+
+/config/params-local.php
