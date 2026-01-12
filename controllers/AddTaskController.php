@@ -10,12 +10,13 @@ use app\models\AddTaskForm;
 use app\models\Task;
 use app\models\File;
 use app\models\Category;
+use app\models\Location;
 
 class AddTaskController extends Controller
 {
   public function actionIndex()
   {
-    if (Yii::$app->user->isGuest || Yii::$app->user->identity->role !== 'customer') {
+    if (Yii::$app->user->isGuest || !Yii::$app->user->can('customer')) {
       throw new ForbiddenHttpException();
     }
 
@@ -34,6 +35,27 @@ class AddTaskController extends Controller
         $task->status = Task::STATUS_NEW;
         $task->employer_id = Yii::$app->user->getId();
 
+        $locationId = null;
+
+        if ($form->location && $form->latitude !== null && $form->longitude !== null) {
+
+          $location = Location::find()
+            ->where(['name' => $form->location])
+            ->one();
+
+          if (!$location) {
+            $location = new Location();
+            $location->name = $form->location;
+            $location->latitude = $form->latitude;
+            $location->longitude = $form->longitude;
+            $location->save(false);
+          }
+
+          $locationId = $location->id;
+        }
+
+        $task->location_id = $locationId;
+
         $task->save(false);
 
         if (!empty($form->files)) {
@@ -47,9 +69,10 @@ class AddTaskController extends Controller
             $taskFile->save(false);
           }
         }
-
-        return $this->redirect(['task/view', 'id' => $task->id]);
+        Yii::debug(Yii::$app->request->post(), 'add-task');
+        return $this->redirect(['tasks/view', 'id' => $task->id]);
       }
+       $form->files = null;
     }
 
     $categories = Category::find()->all();
