@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Url;
+use yii\helpers\Html;
 use app\models\Task;
 use app\models\Response;
 use yii\widgets\ActiveForm;
@@ -38,82 +39,86 @@ $currentUserId = Yii::$app->user->isGuest ? null : (int)Yii::$app->user->id;
       <?php if ($isCustomer &&  $task->status === Task::STATUS_IN_PROGRESS): ?>
         <a href="#" class="button button--pink action-btn" data-action="completion">Завершить задание</a>
       <?php endif; ?>
+      <?php if ($task->location): ?>
     <div class="task-map">
-      <img class="map" src="img/map.png" width="725" height="346" alt="Новый арбат, 23, к. 1">
-      <p class="map-address town">Москва</p>
-      <p class="map-address">Новый арбат, 23, к. 1</p>
+      <div id="task-map" style="width: 600px; height: 400px"></div>
+      <p class="map-address town">
+        <?= Html::encode($task->location->name) ?>
+      </p>
     </div>
-        <?php if (!$isGuest && empty($responses)): ?>
-    <h4 class="head-regular">Отклики на задание</h4>
-      <p>Пока нет откликов</p>
-    <?php else: ?>
-      <?php foreach ($responses as $response): ?>
-        <div class="response-card">
-          <img class="customer-photo" src="img/man-sweater.png" width="146" height="156" alt="Фото заказчиков">
-          <div class="feedback-wrapper">
-            <a href="<?= Url::to(['users/view', 'id' => $response->worker_id]) ?>"
-              class="link link--block link--big">
-              <?= htmlspecialchars($response->worker->name) ?>
-            </a>
-            <div class="response-wrapper">
-              <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
-              <p class="reviews">8 отзывов</p>
-            </div>
-            <p class="response-message">
-              <?= htmlspecialchars($response->comment) ?>
-            </p>
-          </div>
-          <div class="feedback-wrapper">
-            <p class="info-text">
-              <?= Yii::$app->formatter->asRelativeTime($response->date_add) ?>
-            </p>
-            <p class="price price--small"><?= (int)$response->cost ?> ₽</p>
-          </div>
-          <?php if (
-            $isCustomer &&
-            $task->status === Task::STATUS_NEW &&
-            $response->status === Response::STATUS_NEW
-          ): ?>
-            <div class="button-popup">
-              <a href="<?= Url::to(['response/accept', 'id' => $response->id]) ?>" class="button button--blue button--small">
-                Принять
-              </a>
-              <a href="<?= Url::to(['response/reject', 'id' => $response->id]) ?>" class="button button--orange button--small">
-                Отказать
-              </a>
-            </div>
-      <?php endif ?>
-    <?php endforeach ?>
   <?php endif; ?>
+  <?php if (!$isGuest && empty($responses)): ?>
+    <h4 class="head-regular">Отклики на задание</h4>
+    <p>Пока нет откликов</p>
+  <?php else: ?>
+    <?php foreach ($responses as $response): ?>
+      <div class="response-card">
+        <img class="customer-photo" src="img/man-sweater.png" width="146" height="156" alt="Фото заказчиков">
+        <div class="feedback-wrapper">
+          <a href="<?= Url::to(['users/view', 'id' => $response->worker_id]) ?>"
+            class="link link--block link--big">
+            <?= htmlspecialchars($response->worker->name) ?>
+          </a>
+          <div class="response-wrapper">
+            <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
+            <p class="reviews">8 отзывов</p>
           </div>
-  <div class="right-column">
-    <div class="right-card black info-card">
-      <h4 class="head-card">Информация о задании</h4>
-      <dl class="black-list">
-        <dt>Категория</dt>
-        <dd><?= $task->category->title ?? '' ?></dd>
-        <dt>Дата публикации</dt>
-        <dt><?= Yii::$app->formatter->asRelativeTime($task->date_add) ?></dt>
-        <dt>Срок выполнения</dt>
-        <dd><?= Yii::$app->formatter->asRelativeTime($task->date_end) ?></dd>
-        <dt>Статус</dt>
-        <dd><?= $task->status ?></dd>
-      </dl>
-    </div>
-    <div class="right-card white file-card">
-      <h4 class="head-card">Файлы задания</h4>
-      <ul class="enumeration-list">
-        <li class="enumeration-item">
-          <a href="#" class="link link--block link--clip">my_picture.jpg</a>
-          <p class="file-size">356 Кб</p>
-        </li>
-        <li class="enumeration-item">
-          <a href="#" class="link link--block link--clip">information.docx</a>
-          <p class="file-size">12 Кб</p>
-        </li>
-      </ul>
-    </div>
-  </div>
+          <p class="response-message">
+            <?= htmlspecialchars($response->comment) ?>
+          </p>
+        </div>
+        <div class="feedback-wrapper">
+          <p class="info-text">
+            <?= Yii::$app->formatter->asRelativeTime($response->date_add) ?>
+          </p>
+          <p class="price price--small"><?= (int)$response->cost ?> ₽</p>
+        </div>
+        <?php if (
+          $isCustomer &&
+          $task->status === Task::STATUS_NEW &&
+          $response->status === Response::STATUS_NEW
+        ): ?>
+          <div class="button-popup">
+            <a href="<?= Url::to(['response/accept', 'id' => $response->id]) ?>" class="button button--blue button--small">
+              Принять
+            </a>
+            <a href="<?= Url::to(['response/reject', 'id' => $response->id]) ?>" class="button button--orange button--small">
+              Отказать
+            </a>
+          </div>
+        <?php endif ?>
+      <?php endforeach ?>
+    <?php endif; ?>
+
+      </div>
+      <div class="right-column">
+        <div class="right-card black info-card">
+          <h4 class="head-card">Информация о задании</h4>
+          <dl class="black-list">
+            <dt>Категория</dt>
+            <dd><?= $task->category->title ?? '' ?></dd>
+            <dt>Дата публикации</dt>
+            <dt><?= Yii::$app->formatter->asRelativeTime($task->date_add) ?></dt>
+            <dt>Срок выполнения</dt>
+            <dd><?= Yii::$app->formatter->asRelativeTime($task->date_end) ?></dd>
+            <dt>Статус</dt>
+            <dd><?= $task->status ?></dd>
+          </dl>
+        </div>
+        <div class="right-card white file-card">
+          <h4 class="head-card">Файлы задания</h4>
+          <ul class="enumeration-list">
+            <li class="enumeration-item">
+              <a href="#" class="link link--block link--clip">my_picture.jpg</a>
+              <p class="file-size">356 Кб</p>
+            </li>
+            <li class="enumeration-item">
+              <a href="#" class="link link--block link--clip">information.docx</a>
+              <p class="file-size">12 Кб</p>
+            </li>
+          </ul>
+        </div>
+      </div>
 </main>
 <section class="pop-up pop-up--refusal pop-up--close">
   <div class="pop-up--wrapper">
@@ -138,7 +143,7 @@ $currentUserId = Yii::$app->user->isGuest ? null : (int)Yii::$app->user->id;
       Вы собираетесь отметить это задание как выполненное.
       Пожалуйста, оставьте отзыв об исполнителе и отметьте отдельно, если возникли проблемы.
     </p>
-   <div class="completion-form pop-up--form regular-form">
+    <div class="completion-form pop-up--form regular-form">
       <?php $form = ActiveForm::begin([
         'action' => ['tasks/complete', 'id' => $task->id],
         'method' => 'post'
@@ -187,3 +192,20 @@ $currentUserId = Yii::$app->user->isGuest ? null : (int)Yii::$app->user->id;
     </div>
   </div>
 </section>
+<script src="https://api-maps.yandex.ru/2.1/?apikey=<?= Yii::$app->params['yandexGeocoderApiKey'] ?>&lang=ru_RU" type="text/javascript"></script>
+<script type="text/javascript">
+  <?php if ($task->location && $task->location->latitude && $task->location->longitude): ?>
+    ymaps.ready(init);
+    function init() {
+      var myMap = new ymaps.Map("task-map", {
+        center: [<?= $task->location->latitude ?>, <?= $task->location->longitude ?>],
+        zoom: 15
+      });
+      myMap.geoObjects.add(new ymaps.Placemark(
+        [<?= $task->location->latitude ?>, <?= $task->location->longitude ?>], {
+          balloonContent: '<?= addslashes($task->location->name) ?>'
+        }
+      ));
+    }
+  <?php endif; ?>
+</script>

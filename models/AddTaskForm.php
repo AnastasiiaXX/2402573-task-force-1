@@ -14,13 +14,15 @@ class AddTaskForm extends Model
   public $location = '';
   public $cost = '';
   public $date_end = '';
+  public $latitude;
+  public $longitude;
 
   public function rules()
   {
     return [
       [['title', 'description', 'category_id'], 'required'],
-      ['title', 'validateMinNonWhitespace', 'min' => 10],
-      ['description', 'validateMinNonWhitespace', 'min' => 30],
+      ['title', 'validateMinNonWhitespace', 'params' => ['min' => 10]],
+      ['description', 'validateMinNonWhitespace', 'params' => ['min' => 30]],
       [
         ['category_id'],
         'exist',
@@ -35,7 +37,10 @@ class AddTaskForm extends Model
         'file',
         'skipOnEmpty' => true,
         'maxFiles' => 5,
-      ]
+      ],
+      [['location', 'latitude', 'longitude'], 'safe'],
+      [['latitude', 'longitude'], 'number'],
+      
     ];
   }
 
@@ -63,6 +68,8 @@ class AddTaskForm extends Model
       'description' => 'Подробности задания',
       'category_id' => 'Категория',
       'location_id' => 'Локация',
+      'latitude' => 'Широта',
+      'longitude' => 'Долгота',
       'cost' => 'Бюджет',
       'date_end' => 'Срок исполнения',
     ];
