@@ -35,7 +35,7 @@ class SiteController extends Controller
                     'logout' => ['post'],
                 ],
             ],
-        ];
+          ];
     }
 
     /**

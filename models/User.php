@@ -39,7 +39,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        // TODO: Implement findIdentityByAccessToken() method.
+      throw new \yii\base\NotSupportedException();
     }
 
     public function getId()
@@ -49,12 +49,12 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     public function getAuthKey()
     {
-      return null;
+      return $this->auth_key;
     }
 
     public function validateAuthKey($authKey)
     {
-      return true;
+      return $this->auth_key === $authKey;
     }
 
     /**

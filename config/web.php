@@ -13,6 +13,17 @@ $config = [
     '@npm'   => '@vendor/npm-asset',
   ],
   'components' => [
+    'authClientCollection' => [
+      'class' => yii\authclient\Collection::class,
+      'clients' => [
+        'github' => [
+          'class' => yii\authclient\clients\GitHub::class,
+          'clientId' => $_ENV['GITHUB_CLIENT_ID'],
+          'clientSecret' => $_ENV['GITHUB_CLIENT_SECRET'],
+          'scope' => 'user:email'
+        ],
+      ],
+    ],
     'authManager' => [
       'class' => yii\rbac\DbManager::class,
     ],
