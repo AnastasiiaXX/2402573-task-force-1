@@ -40,3 +40,7 @@ tests/_support/_generated
 .docker/log/*
 
 /config/params-local.php
+
+/web/uploads/
+
+/web/img/avatars/
