@@ -13,9 +13,37 @@ use app\models\User;
 use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\filters\AccessControl;
 
 class TasksController extends Controller
-{
+{ 
+  public function behaviors()
+  {
+    return [
+      'access' => [
+        'class' => AccessControl::class,
+        'only' => ['index', 'view', 'complete', 'decline', 'cancel'],
+        'rules' => [
+          [
+            'actions' => ['index', 'view'],
+            'allow' => true,
+            'roles' => ['@'],
+          ],
+          [
+            'actions' => ['complete', 'cancel'],
+            'allow' => true,
+            'roles' => ['customer'],
+          ],
+          [
+            'actions' => ['decline'],
+            'allow' => true,
+            'roles' => ['worker'],
+          ],
+        ],
+      ],
+    ];
+  }
+
   public function actionIndex()
   {
 
@@ -93,13 +121,13 @@ class TasksController extends Controller
     $query = Response::find()->where(['task_id' => $task->id]);
 
     if ($isGuest) {
-      $responses =[];
+      $responses = [];
     } elseif ($isCustomer) {
       $responses = $query->all();
     } elseif ($isWorker) {
       $responses = $query
-          ->andWhere(['worker_id' => $userId])
-          ->all();
+        ->andWhere(['worker_id' => $userId])
+        ->all();
     } else {
       $responses = [];
     }
@@ -126,7 +154,7 @@ class TasksController extends Controller
     if (!$task) {
       throw new NotFoundHttpException('Задача не найдена');
     }
-    
+
     if ((int)$task->employer_id !== (int)Yii::$app->user->id) {
       throw new ForbiddenHttpException();
     }

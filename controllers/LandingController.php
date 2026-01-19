@@ -6,13 +6,28 @@ use Yii;
 use app\models\LoginForm;
 use app\models\User;
 use yii\web\Controller;
-
+use yii\filters\AccessControl;
 
 class LandingController extends Controller
 {
   public $layout = 'landing';
-  
- public function actionIndex()
+
+  public function behaviors()
+  {
+    return [
+      'access' => [
+        'class' => AccessControl::class,
+        'rules' => [
+          [
+            'allow' => true,
+            'roles' => ['?'],
+          ],
+        ],
+      ],
+    ];
+  }
+
+  public function actionIndex()
   {
     $loginForm = new LoginForm();
 
@@ -22,28 +37,28 @@ class LandingController extends Controller
     }
 
     $showModal = false;
-    
+
     if ($loginForm->load(Yii::$app->request->post())) {
-        if ($loginForm->validate()) {
-            Yii::$app->user->login($loginForm->getUser());
-            return $this->redirect(['/tasks']);
-        } else {
-            $showModal = true;
-        }
+      if ($loginForm->validate()) {
+        Yii::$app->user->login($loginForm->getUser());
+        return $this->redirect(['/tasks']);
+      } else {
+        $showModal = true;
+      }
     }
 
     return $this->render('index', [
-        'model' => $loginForm,
-        'showModal' => $showModal
+      'model' => $loginForm,
+      'showModal' => $showModal
     ]);
   }
 
-      /**
+  /**
    * {@inheritdoc}
    */
   public function actions()
   {
-    
+
     return [
       'auth' => [
         'class' => 'yii\authclient\AuthAction',
@@ -63,23 +78,23 @@ class LandingController extends Controller
     $user = $email ? User::find()->where(['email' => $email])->one() : null;
 
     if (!$user) {
-        $user = User::find()->where(['github_id' => $githubId])->one();
+      $user = User::find()->where(['github_id' => $githubId])->one();
     }
 
     if (!$user) {
-        $user = new User();
-        $user->github_id = $githubId;
-        $user->name = $username;
-        $user->email = $email;
-        $user->auth_key = Yii::$app->security->generateRandomString();
-        $user->save(false);
+      $user = new User();
+      $user->github_id = $githubId;
+      $user->name = $username;
+      $user->email = $email;
+      $user->auth_key = Yii::$app->security->generateRandomString();
+      $user->save(false);
     } else {
-        if (!$user->github_id) {
-            $user->github_id = $githubId;
-            $user->save(false);
-        }
+      if (!$user->github_id) {
+        $user->github_id = $githubId;
+        $user->save(false);
+      }
     }
-  /** @var \app\models\User $user */
+    /** @var \app\models\User $user */
     Yii::$app->user->login($user);
 
     return $this->redirect(['/tasks']);

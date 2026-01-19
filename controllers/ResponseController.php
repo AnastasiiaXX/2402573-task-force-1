@@ -1,17 +1,41 @@
 <?php
+
 namespace app\controllers;
 
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\filters\AccessControl;
 use app\models\Task;
 use app\models\Response;
-use TaskForce\Action\Respond;
+
 
 class ResponseController extends Controller
 {
-  function actionReject($id)
+  public function behaviors()
+  {
+    return [
+      'access' => [
+        'class' => AccessControl::class,
+        'only' => ['create', 'accept', 'reject'],
+        'rules' => [
+          [
+            'actions' => ['create'],
+            'allow' => true,
+            'roles' => ['worker'],
+          ],
+          [
+            'actions' => ['accept', 'reject'],
+            'allow' => true,
+            'roles' => ['customer'],
+          ],
+        ],
+      ],
+    ];
+  }
+
+  public function actionReject($id)
   {
     $response = Response::findOne($id);
 
@@ -32,7 +56,7 @@ class ResponseController extends Controller
     return $this->redirect(['tasks/view', 'id' => $task->id]);
   }
 
-  function actionAccept($id)
+  public function actionAccept($id)
   {
     $response = Response::findOne($id);
 
@@ -48,7 +72,7 @@ class ResponseController extends Controller
     }
 
     if ($task->status !== Task::STATUS_NEW) {
-    throw new ForbiddenHttpException();
+      throw new ForbiddenHttpException();
     }
 
     $response->status = Response::STATUS_ACCEPTED;
@@ -63,10 +87,6 @@ class ResponseController extends Controller
 
   public function actionCreate($taskId)
   {
-    if (Yii::$app->user->isGuest || !Yii::$app->user->can('worker')) {
-      throw new ForbiddenHttpException();
-    }
-
     $task = Task::findOne($taskId);
 
     if (!$task || $task->status !== Task::STATUS_NEW) {
@@ -76,12 +96,12 @@ class ResponseController extends Controller
     $workerId = Yii::$app->user->id;
 
     $alreadyExists = Response::find()
-        ->where([
-          'task_id' => $taskId,
-          'worker_id' => $workerId
-        ])
-        ->exists();
-    
+      ->where([
+        'task_id' => $taskId,
+        'worker_id' => $workerId
+      ])
+      ->exists();
+
     if ($alreadyExists) {
       return $this->redirect(['tasks/view', 'id' => $taskId]);
     }
@@ -95,12 +115,12 @@ class ResponseController extends Controller
       $response->date_add = date('Y-m-d H:i:s');
 
       if ($response->cost !== null && $response->cost <= 0) {
-      return $this->redirect(['tasks/view', 'id' => $taskId]);
+        return $this->redirect(['tasks/view', 'id' => $taskId]);
       }
 
       $response->save(false);
     }
 
-    return $this->redirect(['tasks/view', 'id' => $taskId]);    
+    return $this->redirect(['tasks/view', 'id' => $taskId]);
   }
 }
