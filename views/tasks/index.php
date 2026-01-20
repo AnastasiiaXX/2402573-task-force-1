@@ -5,7 +5,6 @@
 use yii\widgets\LinkPager;
 use yii\helpers\Url;
 ?>
-
 <main class="main-content container">
 <div class="left-column">
   <h3 class="head-main head-task">Новые задания</h3>

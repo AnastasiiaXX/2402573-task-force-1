@@ -1,90 +1,109 @@
+<?php
+use yii\helpers\Html;
+use yii\helpers\Url;
+
+/** @var \app\models\User $user */
+
+?>
+
 <main class="main-content container">
     <div class="left-column">
-        <h3 class="head-main"><?= htmlspecialchars($user->name) ?></h3>
+        <h3 class="head-main"><?= Html::encode($user->name) ?></h3>
+
         <div class="user-card">
             <div class="photo-rate">
-                <img class="card-photo" src="img/man-glasses.png" width="191" height="190" alt="Фото пользователя">
+                <img class="card-photo" src="<?= Html::encode($user->avatar ?: 'img/man-glasses.png') ?>" 
+                     width="191" height="190" alt="Фото пользователя">
                 <div class="card-rate">
-                    <div class="stars-rating big"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
-                    <span class="current-rate">4.23</span>
+                    <div class="stars-rating big">
+                        <?php 
+                        $rating = round($user->getAverageRating() ?? 0);
+                        for ($i = 1; $i <= 5; $i++): ?>
+                            <span class="<?= $i <= $rating ? 'fill-star' : '' ?>">&nbsp;</span>
+                        <?php endfor; ?>
+                    </div>
+                    <span class="current-rate"><?= number_format($user->getAverageRating() ?? 0, 2) ?></span>
                 </div>
             </div>
-            <p class="user-description">
-                <?= htmlspecialchars($user->about) ?>
-            </p>
+            <p class="user-description"><?= Html::encode($user->about) ?></p>
         </div>
+
         <div class="specialization-bio">
             <div class="specialization">
                 <p class="head-info">Специализации</p>
                 <ul class="special-list">
-                    <li class="special-item">
-                        <a href="#" class="link link--regular">Ремонт бытовой техники</a>
-                    </li>
-                    <li class="special-item">
-                        <a href="#" class="link link--regular">Курьер</a>
-                    </li>
-                    <li class="special-item">
-                        <a href="#" class="link link--regular">Оператор ПК</a>
-                    </li>
+                    <?php foreach ($user->specialties as $specialty): ?>
+                        <li class="special-item">
+                            <a href="#" class="link link--regular"><?= Html::encode($specialty->name) ?></a>
+                        </li>
+                    <?php endforeach; ?>
                 </ul>
             </div>
             <div class="bio">
                 <p class="head-info">Био</p>
-                <p class="bio-info"><span class="country-info">Россия</span>, <span class="town-info">Петербург</span>, <span class="age-info">30</span> лет</p>
+                <p class="bio-info">
+                    <span class="country-info"><?= Html::encode($user->location->country ?? 'Россия') ?></span>, 
+                    <span class="town-info"><?= Html::encode($user->location->city ?? 'Петербург') ?></span>, 
+                    <span class="age-info"><?= $age ?? '-' ?></span>
+                </p>
             </div>
         </div>
+
         <h4 class="head-regular">Отзывы заказчиков</h4>
-        <div class="response-card">
-            <img class="customer-photo" src="img/man-coat.png" width="120" height="127" alt="Фото заказчиков">
-            <div class="feedback-wrapper">
-                <p class="feedback">«Кумар сделал всё в лучшем виде. Буду обращаться к нему в
-                    будущем, если возникнет такая необходимость!»</p>
-                <p class="task">Задание «<a href="#" class="link link--small">Повесить полочку</a>» выполнено</p>
-            </div>
-            <div class="feedback-wrapper">
-                <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
-                <p class="info-text"><span class="current-time">25 минут </span>назад</p>
-            </div>
-        </div>
-        <div class="response-card">
-            <img class="customer-photo" src="img/man-sweater.png" width="120" height="127" alt="Фото заказчиков">
-            <div class="feedback-wrapper">
-                <p class="feedback">«Кумар сделал всё в лучшем виде. Буду обращаться к нему в
-                    будущем, если возникнет такая необходимость!»</p>
-                <p class="task">Задание «<a href="#" class="link link--small">Повесить полочку</a>» выполнено</p>
-            </div>
-            <div class="feedback-wrapper">
-                <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
-                <p class="info-text"><span class="current-time">25 минут </span>назад</p>
-            </div>
+        <?php foreach ($user->responses as $response): ?>
+    <?php $customer = $response->task->employer; ?>
+    <div class="response-card">
+        <img class="customer-photo" src="<?= Html::encode($customer->avatar ?: 'img/man-coat.png') ?>" 
+             width="120" height="127" alt="Фото заказчика">
+        <div class="feedback-wrapper">
+            <p class="feedback"><?= Html::encode($response->comment) ?></p>
+            <p class="task">
+                Задание «<a href="<?= Url::to(['tasks/view', 'id' => $response->task_id]) ?>" class="link link--small">
+                <?= Html::encode($response->task->title) ?></a>» выполнено
         </div>
     </div>
+<?php endforeach; ?>
+    </div>
+
     <div class="right-column">
         <div class="right-card black">
             <h4 class="head-card">Статистика исполнителя</h4>
             <dl class="black-list">
-                    <dt>Всего заказов</dt>
-                    <dd>4 выполнено, 0 провалено</dd>
-                    <dt>Место в рейтинге</dt>
-                    <dd>25 место</dd>
-                    <dt>Дата регистрации</dt>
-                    <dd>15 октября, 13:00</dd>
-                    <dt>Статус</dt>
-                    <dd>Открыт для новых заказов</dd>
+                <dt>Всего заказов</dt>
+                <dd><?= $user->getCompletedTasksCount() ?> выполнено, <?= $user->getFailedTasksCount() ?> провалено</dd>
+                <dt>Место в рейтинге</dt>
+                <dd><?= $user->getRatingPosition() ?> место</dd>
+                <dt>Дата регистрации</dt>
+                <dd><?= Yii::$app->formatter->asDatetime($user->created_at, 'd MMMM yyyy HH:mm') ?></dd>
+                <dt>Статус</dt>
+                <dd><?= $user->isAvailable() ? 'Открыт для новых заказов' : 'Закрыт' ?></dd>
             </dl>
         </div>
+
         <div class="right-card white">
             <h4 class="head-card">Контакты</h4>
             <ul class="enumeration-list">
-                <li class="enumeration-item">
-                    <a href="#" class="link link--block link--phone">+7 (906) 256-06-08</a>
-                </li>
-                <li class="enumeration-item">
-                    <a href="#" class="link link--block link--email">super-pavel@mail.ru</a>
-                </li>
-                <li class="enumeration-item">
-                    <a href="#" class="link link--block link--tg">@superpasha</a>
-                </li>
+                <?php if ($user->phone_number): ?>
+                    <li class="enumeration-item">
+                        <a href="tel:<?= Html::encode($user->phone_number) ?>" class="link link--block link--phone">
+                            <?= Html::encode($user->phone_number) ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
+                <?php if ($user->email): ?>
+                    <li class="enumeration-item">
+                        <a href="mailto:<?= Html::encode($user->email) ?>" class="link link--block link--email">
+                            <?= Html::encode($user->email) ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
+                <?php if ($user->telegram_name): ?>
+                    <li class="enumeration-item">
+                        <a href="https://t.me/<?= Html::encode($user->telegram_name) ?>" class="link link--block link--tg">
+                            @<?= Html::encode($user->telegram_name) ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>

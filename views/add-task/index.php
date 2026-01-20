@@ -53,7 +53,7 @@ $categoryItems = ArrayHelper::map($categories, 'id', 'title');
 
       <p class="form-label">Файлы</p>
       <div class="form-group">
-          <?= $form->field($model, 'files')->fileInput((['multiple' => true]))->label(false) ?>
+          <?= $form->field($model, 'files[]')->fileInput((['multiple' => true]))->label(false) ?>
       </div>
           <input type="submit" class="button button--blue" value="Опубликовать">
         <?php ActiveForm::end() ?>

@@ -9,12 +9,11 @@ use yii\widgets\ActiveForm;
 $currentUserId = Yii::$app->user->isGuest ? null : (int)Yii::$app->user->id;
 
 ?>
-
 <main class="main-content container">
   <div class="left-column">
     <div class="head-wrapper">
       <h3 class="head-main"><?= htmlspecialchars($task->title) ?></h3>
-      <p class="price price--big"><?= htmlspecialchars($task->cost) ?></p>
+      <p class="price price--big"><?= $task->cost !== null ? htmlspecialchars($task->cost) . ' ₽' : '—' ?></p>
     </div>
     <p class="task-description">
       <?= htmlspecialchars($task->description) ?>
@@ -108,18 +107,34 @@ $currentUserId = Yii::$app->user->isGuest ? null : (int)Yii::$app->user->id;
         <div class="right-card white file-card">
           <h4 class="head-card">Файлы задания</h4>
           <ul class="enumeration-list">
-            <li class="enumeration-item">
-              <a href="#" class="link link--block link--clip">my_picture.jpg</a>
-              <p class="file-size">356 Кб</p>
-            </li>
-            <li class="enumeration-item">
-              <a href="#" class="link link--block link--clip">information.docx</a>
-              <p class="file-size">12 Кб</p>
-            </li>
+          <?php if (!empty($task->files)): ?>
+            <?php foreach ($task->files as $file):
+              $filePath = Yii::getAlias('@webroot/uploads/') . $file->path;
+              $fileUrl  = Yii::getAlias('@web/uploads/') . $file->path;
+            ?>
+              <li class="enumeration-item">
+                <?php if (file_exists($filePath)): ?>
+                  <a href="<?= $fileUrl ?>"
+                    class="link link--block link--clip"
+                    target="_blank">
+                    <?= htmlspecialchars($file->path) ?>
+                  </a>
+                  <p class="file-size">
+                    <?= round(filesize($filePath) / 1024) ?> Кб
+                  </p>
+                <?php else: ?>
+                  <span class="link link--block link--clip text-muted">
+                    <?= htmlspecialchars($file->path) ?> (файл отсутствует)
+                  </span>
+                <?php endif; ?>
+              </li>
+            <?php endforeach; ?>
           </ul>
-        </div>
+           <?php else: ?>
+        <p class="text-muted">Файлы не загружены</p>
+    <?php endif; ?>
       </div>
-</main>
+
 <section class="pop-up pop-up--refusal pop-up--close">
   <div class="pop-up--wrapper">
     <h4>Отказ от задания</h4>
@@ -192,6 +207,7 @@ $currentUserId = Yii::$app->user->isGuest ? null : (int)Yii::$app->user->id;
     </div>
   </div>
 </section>
+  </main>
 <script src="https://api-maps.yandex.ru/2.1/?apikey=<?= Yii::$app->params['yandexGeocoderApiKey'] ?>&lang=ru_RU" type="text/javascript"></script>
 <script type="text/javascript">
   <?php if ($task->location && $task->location->latitude && $task->location->longitude): ?>

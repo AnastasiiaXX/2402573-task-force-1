@@ -11,9 +11,25 @@ use app\models\Task;
 use app\models\File;
 use app\models\Category;
 use app\models\Location;
+use yii\filters\AccessControl;
 
 class AddTaskController extends Controller
 {
+
+  public function behaviors()
+  {
+    return [
+      'access' => [
+        'class' => AccessControl::class,
+        'rules' => [
+          [
+            'allow' => true,
+            'roles' => ['customer'],
+          ],
+        ],
+      ],
+    ];
+  }
   public function actionIndex()
   {
     if (Yii::$app->user->isGuest || !Yii::$app->user->can('customer')) {
@@ -72,7 +88,7 @@ class AddTaskController extends Controller
         Yii::debug(Yii::$app->request->post(), 'add-task');
         return $this->redirect(['tasks/view', 'id' => $task->id]);
       }
-       $form->files = null;
+      $form->files = null;
     }
 
     $categories = Category::find()->all();

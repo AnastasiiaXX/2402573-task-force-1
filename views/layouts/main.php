@@ -3,11 +3,9 @@
 /** @var yii\web\View $this */
 /** @var string $content */
 
-use app\assets\AppAsset;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-AppAsset::register($this);
 
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
@@ -16,83 +14,92 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
 $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
 $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
 $this->registerCssFile(Yii::getAlias('@web/css/normalize.css'));
-$this->registerCssFile(Yii::getAlias('@web/css/landing.css'));
-$this->registerJsFile(Yii::getAlias('@web/js/main.js'), ['depends' => [\yii\web\JqueryAsset::class]]);
-$this->registerJsFile(Yii::getAlias('@web/js/landing.js'), ['depends' => [\yii\web\JqueryAsset::class]]);
+$this->registerCssFile(Yii::getAlias('@web/css/style.css'));
+$this->registerJsFile(Yii::getAlias('@web/js/main.js'));
 
 $user = Yii::$app->user->identity ?? null;
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
+
 <head>
-    
-    <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
+
+  <title><?= Html::encode($this->title) ?></title>
+  <?php $this->head() ?>
 </head>
-<body class="d-flex flex-column h-100">
-<?php $this->beginBody() ?>
-<header class="page-header">
+
+<body>
+  <?php $this->beginBody() ?>
+  <header class="page-header">
     <nav class="main-nav">
-        <a href="<?= Url::to(['site/index']) ?>" class="header-logo">
-            <img class="logo-image" src="/img/logotype.png" width="227" height="60" alt="taskforce">
-        </a>
+      <a href="<?= Url::to(['site/index']) ?>" class="header-logo">
+        <img class="logo-image" src="/img/logotype.png" width="227" height="60" alt="taskforce">
+      </a>
 
-        <?php if (!Yii::$app->user->isGuest): ?>
+      <?php if (!Yii::$app->user->isGuest): ?>
         <div class="nav-wrapper">
-            <ul class="nav-list">
-                <li class="list-item list-item--active">
-                    <a href="<?= Url::to(['/tasks/index']) ?>" class="link link--nav">Новое</a>
-                </li>
+          <ul class="nav-list">
 
-                <?php if (Yii::$app->user->can('customer')): ?>
-                <li class="list-item">
-                    <a href="<?= Url::to(['/my-task/index']) ?>" class="link link--nav">Мои задания</a>
-                </li>
-                <li class="list-item">
-                    <a href="<?= Url::to(['/add-task/index']) ?>" class="link link--nav">Создать задание</a>
-                </li>
-                <?php endif; ?>
+            <li class="list-item <?= Yii::$app->controller->id === 'tasks' ? 'list-item--active' : '' ?>">
+              <a href="<?= Url::to(['/tasks/index']) ?>" class="link link--nav">Новое</a>
+            </li>
 
-                <li class="list-item">
-                    <a href="#" class="link link--nav">Настройки</a>
-                </li>
-            </ul>
+            <li class="list-item <?= Yii::$app->controller->id === 'my-tasks' ? 'list-item--active' : '' ?>">
+              <a href="<?= Url::to(['/my-tasks/index']) ?>" class="link link--nav">Мои задания</a>
+            </li>
+
+            <?php if (Yii::$app->user->can('customer')): ?>
+              <li class="list-item">
+                <a href="<?= Url::to(['/add-task/index']) ?>" class="link link--nav">Создать задание</a>
+              </li>
+            <?php endif; ?>
+
+            <?php if (Yii::$app->user->can('worker')): ?>
+              <li class="list-item">
+                <a href="<?= Url::to(['/my-profile/index']) ?>" class="link link--nav">Настройки</a>
+              </li>
+            <?php endif; ?>
+
+          </ul>
         </div>
-        <?php endif; ?>
+      <?php endif; ?>
     </nav>
-
     <?php if (!Yii::$app->user->isGuest): ?>
-    <div class="user-block">
+      <div class="user-block">
         <a href="#">
-            <img class="user-photo" src="/img/man-glasses.png" width="55" height="55" alt="Аватар">
+          <img class="user-photo" src="/img/avatars/default-avatar.jpg" width="55" height="55" alt="Аватар">
         </a>
         <div class="user-menu">
-            <p class="user-name"><?= Html::encode($user->name) ?></p>
-            <div class="popup-head">
-                <ul class="popup-menu">
-                    <li class="menu-item"><a href="#" class="link">Настройки</a></li>
-                    <li class="menu-item"><a href="#" class="link">Связаться с нами</a></li>
-                    <li class="menu-item">
-                        <?= Html::a('Выход из системы', ['/site/logout'], [
-                            'data-method' => 'post',
-                            'class' => 'link'
-                        ]) ?>
-                    </li>
-                </ul>
-            </div>
+          <p class="user-name"><?= Html::encode($user->name) ?></p>
+          <div class="popup-head">
+            <ul class="popup-menu">
+              <?php if (Yii::$app->user->can('worker')): ?>
+                <li class="menu-item"><a href="<?= Url::to(['/my-profile/index']) ?>" class="link">Настройки</a></li>
+              <?php endif; ?>
+              <li class="menu-item"><a href="#" class="link">Связаться с нами</a></li>
+              <li class="menu-item">
+                <?= Html::beginForm(['/site/logout'], 'post', ['style' => 'display:inline']) ?>
+                <button type="submit" class="link" style="background:none;border:none;padding:0;cursor:pointer;">
+                  Выход из системы
+                </button>
+                <?= Html::endForm() ?>
+              </li>
+            </ul>
+          </div>
         </div>
-    </div>
+      </div>
     <?php endif; ?>
-</header>
- 
-<main class="main-content container">
-    <div class="main-container">
-        <?= $content ?>
-    </div>
-</main>
+  </header>
 
-<?php $this->endBody() ?>
+  <main class="main-content container">
+    <div class="main-container">
+      <?= $content ?>
+    </div>
+  </main>
+
+  <?php $this->endBody() ?>
 </body>
+
 </html>
 <?php $this->endPage() ?>

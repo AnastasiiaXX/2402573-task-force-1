@@ -42,6 +42,10 @@ $config = [
     'errorHandler' => [
       'errorAction' => 'site/error',
     ],
+    'formatter' => [
+            'locale' => 'ru-RU',
+            'defaultTimeZone' => 'Europe/Moscow',
+    ],
     'mailer' => [
       'class' => \yii\symfonymailer\Mailer::class,
       'viewPath' => '@app/mail',

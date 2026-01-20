@@ -10,7 +10,8 @@ class AddTaskForm extends Model
   public $title = '';
   public $category_id;
   public $description = '';
-  public $files;
+  /** @var UploadedFile[] */
+  public $files = [];
   public $location = '';
   public $cost = '';
   public $date_end = '';
