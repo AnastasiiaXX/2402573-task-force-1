@@ -4,42 +4,24 @@ use yii\db\Migration;
 
 class m260119_033458_fix_categories_pivot extends Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+  /**
+   * {@inheritdoc}
+   */
     public function safeUp()
     {
-        $this->dropForeignKey(
-            'fk-user_specialties-specialty',
-            'user_specialties'
-        );
+        if ($this->db->schema->getTableSchema('users')->getColumn('specialty_id')) {
+            $this->dropForeignKey('users_ibfk_1', 'users');
+            $this->dropColumn('users', 'specialty_id');
+        }
 
-        $this->renameTable(
-            'user_specialties',
-            'user_categories'
-        );
-
-        $this->renameColumn(
-            'user_categories',
-            'specialty_id',
-            'category_id'
-        );
-
-        $this->addForeignKey(
-            'fk-user_categories-category',
-            'user_categories',
-            'category_id',
-            'categories',
-            'id',
-            'CASCADE',
-            'CASCADE'
-        );
-
+        if ($this->db->schema->getTableSchema('specialties')) {
+            $this->dropTable('specialties');
+        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+  /**
+   * {@inheritdoc}
+   */
     public function safeDown()
     {
         echo "m260119_033458_fix_categories_pivot cannot be reverted.\n";
@@ -47,7 +29,7 @@ class m260119_033458_fix_categories_pivot extends Migration
         return false;
     }
 
-    /*
+  /*
     // Use up()/down() to run migration code without a transaction.
     public function up()
     {

@@ -4,6 +4,7 @@ use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
+
 ?>
 
 <main class="main-content main-content--left container">
@@ -41,8 +42,8 @@ use yii\helpers\ArrayHelper;
   <?= $form->field($model, 'avatarFile', [
     'template' => '{input}',
   ])->fileInput([
-    'id' => 'button-input',
-    'hidden' => true,
+            'id' => 'button-input',
+            'hidden' => true,
   ]) ?>
 
   <label for="button-input" class="button button--black">
@@ -90,8 +91,8 @@ use yii\helpers\ArrayHelper;
   <?= $form->field($model, 'category_ids', [
     'template' => '{input}',
   ])->checkboxList(
-    ArrayHelper::map($categories, 'id', 'title'),
-    [
+      ArrayHelper::map($categories, 'id', 'title'),
+      [
       'class' => 'checkbox-profile',
       'item' => function ($index, $label, $name, $checked, $value) {
         return '<label class="control-label">'
@@ -99,7 +100,7 @@ use yii\helpers\ArrayHelper;
           . ' ' . Html::encode($label)
           . '</label>';
       }
-    ]
+      ]
   ) ?>
 </div>
 

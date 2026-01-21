@@ -7,26 +7,26 @@ use yii\base\Model;
 
 class ChangePasswordForm extends Model
 {
-  public $currentPassword;
-  public $newPassword;
-  public $newPasswordRepeat;
+    public $currentPassword;
+    public $newPassword;
+    public $newPasswordRepeat;
 
-  public function rules()
-  {
-    return [
-      [['currentPassword', 'newPassword', 'newPasswordRepeat'], 'required'],
-      ['currentPassword', function ($attribute, $params) {
+    public function rules()
+    {
+        return [
+        [['currentPassword', 'newPassword', 'newPasswordRepeat'], 'required'],
+        ['currentPassword', function ($attribute, $params) {
                 $user = Yii::$app->user->identity;
-                if (!$user || !Yii::$app->security->validatePassword($this->$attribute, $user->password)) {
-                    $this->addError($attribute, 'Старый пароль введён неверно');
-                }
-            }],
-      [['newPassword'], 'string', 'min' => 8],
-      [['newPasswordRepeat'], 'compare', 'compareAttribute' => 'newPassword',
+            if (!$user || !Yii::$app->security->validatePassword($this->$attribute, $user->password)) {
+                $this->addError($attribute, 'Старый пароль введён неверно');
+            }
+        }],
+        [['newPassword'], 'string', 'min' => 8],
+        [['newPasswordRepeat'], 'compare', 'compareAttribute' => 'newPassword',
         'message' => 'Пароли не совпадают'
-      ],
-    ];
-  }
+        ],
+        ];
+    }
 
   /**
      * change user password
@@ -44,12 +44,12 @@ class ChangePasswordForm extends Model
     }
 
     public function attributeLabels()
-  {
-    return [
+    {
+        return [
 
-      'currentPassword' => 'Текущий пароль',
-      'newPassword' => 'Новый пароль',
-      'newPasswordRepeat' => 'Введите новый пароль еще раз',
-    ];
-  }
+        'currentPassword' => 'Текущий пароль',
+        'newPassword' => 'Новый пароль',
+        'newPasswordRepeat' => 'Введите новый пароль еще раз',
+        ];
+    }
 }

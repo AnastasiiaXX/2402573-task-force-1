@@ -7,72 +7,74 @@ use app\models\Category;
 
 class AddTaskForm extends Model
 {
-  public $title = '';
-  public $category_id;
-  public $description = '';
+    public $title = '';
+    public $category_id;
+    public $description = '';
   /** @var UploadedFile[] */
-  public $files = [];
-  public $location = '';
-  public $cost = '';
-  public $date_end = '';
-  public $latitude;
-  public $longitude;
+    public $files = [];
+    public $cost = '';
+    public $date_end = '';
+    public $location;
+    public $address;
+    public $city;
+    public $latitude;
+    public $longitude;
 
-  public function rules()
-  {
-    return [
-      [['title', 'description', 'category_id'], 'required'],
-      ['title', 'validateMinNonWhitespace', 'params' => ['min' => 10]],
-      ['description', 'validateMinNonWhitespace', 'params' => ['min' => 30]],
-      [
+    public function rules()
+    {
+        return [
+        [['title', 'description', 'category_id'], 'required'],
+        ['title', 'validateMinNonWhitespace', 'params' => ['min' => 10]],
+        ['description', 'validateMinNonWhitespace', 'params' => ['min' => 30]],
+        [
         ['category_id'],
         'exist',
         'targetClass' => Category::class,
         'targetAttribute' => ['category_id' => 'id']
-      ],
-      ['cost', 'integer', 'min' => 1],
-      [['date_end'], 'date', 'format' => 'php:Y-m-d'],
-      [['date_end'], 'validateDeadline'],
-      [
+        ],
+        ['cost', 'integer', 'min' => 1],
+        [['date_end'], 'date', 'format' => 'php:Y-m-d'],
+        [['date_end'], 'validateDeadline'],
+        [
         ['files'],
         'file',
         'skipOnEmpty' => true,
         'maxFiles' => 5,
-      ],
-      [['location', 'latitude', 'longitude'], 'safe'],
-      [['latitude', 'longitude'], 'number'],
-      
-    ];
-  }
-
-  public function validateDeadline($attribute)
-  {
-    if ($this->$attribute && strtotime($this->$attribute) < strtotime(date('Y-m-d'))) {
-      $this->addError($attribute, 'Дата не может быть раньше текущего дня');
+        ],
+        [['location', 'latitude', 'longitude', 'city', 'address'], 'safe'],
+        [['latitude', 'longitude'], 'number'],
+        [['city', 'address'], 'string'],
+        ];
     }
-  }
 
-  public function validateMinNonWhitespace($attribute, $params)
-  {
-    $min = $params['min'] ?? 1;
-    $text = preg_replace('/\s+/u', '', (string)$this->$attribute);
-
-    if (mb_strlen($text) < $min) {
-      $this->addError($attribute, "Минимум {$min} непробельных символов.");
+    public function validateDeadline($attribute)
+    {
+        if ($this->$attribute && strtotime($this->$attribute) < strtotime(date('Y-m-d'))) {
+            $this->addError($attribute, 'Дата не может быть раньше текущего дня');
+        }
     }
-  }
 
-  public function attributeLabels()
-  {
-    return [
-      'title' => 'Суть работы',
-      'description' => 'Подробности задания',
-      'category_id' => 'Категория',
-      'location_id' => 'Локация',
-      'latitude' => 'Широта',
-      'longitude' => 'Долгота',
-      'cost' => 'Бюджет',
-      'date_end' => 'Срок исполнения',
-    ];
-  }
+    public function validateMinNonWhitespace($attribute, $params)
+    {
+        $min = $params['min'] ?? 1;
+        $text = preg_replace('/\s+/u', '', (string)$this->$attribute);
+
+        if (mb_strlen($text) < $min) {
+            $this->addError($attribute, "Минимум {$min} непробельных символов.");
+        }
+    }
+
+    public function attributeLabels()
+    {
+        return [
+        'title' => 'Суть работы',
+        'description' => 'Подробности задания',
+        'category_id' => 'Категория',
+        'location_id' => 'Локация',
+        'latitude' => 'Широта',
+        'longitude' => 'Долгота',
+        'cost' => 'Бюджет',
+        'date_end' => 'Срок исполнения',
+        ];
+    }
 }

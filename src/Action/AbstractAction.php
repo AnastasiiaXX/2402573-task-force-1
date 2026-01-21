@@ -1,4 +1,5 @@
 <?php
+
 namespace TaskForce\Action;
 
 use TaskForce\Enum\Status;

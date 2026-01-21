@@ -4,12 +4,17 @@
 
 use yii\widgets\LinkPager;
 use yii\helpers\Url;
+use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
+
 ?>
+
 <main class="main-content container">
 <div class="left-column">
   <h3 class="head-main head-task">Новые задания</h3>
 
-  <?php foreach ($tasks as $task): ?>
+  <?php foreach ($tasks as $task) : ?>
     <div class="task-card">
       <div class="header-task">
         <a href="<?= Url::to(['tasks/view', 'id' => $task->id]) ?>" class="link link--block link--big">
@@ -37,13 +42,13 @@ use yii\helpers\Url;
         <p class="info-text category-text">
           <?= $task->category ? $task->category->title : '—' ?>
         </p>
-        <a href="#" class="button button--black">Смотреть задание</a>
+        <a href="<?= Url::to(['tasks/view', 'id' => $task->id]) ?>" class="button button--black">Смотреть задание</a>
       </div>
     </div>
   <?php endforeach; ?>
-  <?php if ($pages->pageCount > 1): ?>
+  <?php if ($pages->pageCount > 1) : ?>
   <div class="pagination-wrapper">
-    <?= LinkPager::widget([
+        <?= LinkPager::widget([
         'pagination' => $pages,
         'options' => ['class' => 'pagination-list'],
         'linkContainerOptions' => ['class' => 'pagination-item'],
@@ -52,54 +57,60 @@ use yii\helpers\Url;
         'disabledPageCssClass' => 'mark',
     ]) ?>
   </div>
-<?php endif; ?>
+  <?php endif; ?>
   </div>
 <div class="right-column">
     <div class="right-card black">
       <div class="search-form">
-        <form method="get" action="/index.php">
-          <input type="hidden" name="r" value="tasks/index">
 
-          <h4 class="head-card">Категории</h4>
-          <div class="form-group">
-            <div class="checkbox-wrapper">
-              <?php foreach ($categories as $category): ?>
-                <label class="control-label" for="category-<?= $category->id ?>">
-                  <input type="checkbox"
-                    name="categories[]"
-                    id="category-<?= $category->id ?>"
-                    value="<?= $category->id ?>"
-                  <?= in_array($category->id, $filters->categories ?? []) ? 'checked' : '' ?>>
-                  <?= $category->title ?>
-                </label>
-              <?php endforeach; ?>
-            </div>
-          </div>
+        <?php $form = ActiveForm::begin([
+        'method' => 'get',
+        'action' => ['tasks/index'],
+        'fieldConfig' => [
+          'template' => "{input}",
+        ],
+      ]); ?>
 
-          <h4 class="head-card">Дополнительно</h4>
-          <div class="form-group">
-            <label class="control-label" for="without-performer">
-              <input id="without-performer"
-                type="checkbox"
-                name="notTaken"
-                value="1"
-                <?= $filters->notTaken ? "checked" : "" ?>>
-              Без исполнителя
-            </label>
-          </div>
+      <h4 class="head-card">Категории</h4>
+        <div class="checkbox-wrapper">
 
-          <h4 class="head-card">Период</h4>
-          <div class="form-group">
-            <label for="period-value"></label>
-            <select name="timePeriod">
-              <option value="">Любой</option>
-              <option value="1" <?= $filters->timePeriod == 1 ? 'selected' : '' ?>>1 час</option>
-              <option value="12" <?= $filters->timePeriod == 12 ? 'selected' : '' ?>>12 часов</option>
-              <option value="24" <?= $filters->timePeriod == 24 ? 'selected' : '' ?>>24 часа</option>
-            </select>
-          </div>
-          <input type="submit" class="button button--blue" value="Искать">
-        </form>
+          <?= $form->field($filters, 'categories')->checkboxList(
+              ArrayHelper::map($categories, 'id', 'title'),
+              [
+              'item' => function ($index, $label, $name, $checked, $value) {
+                return '<label class="control-label">'
+                  . Html::checkbox($name, $checked, ['value' => $value])
+                  . ' ' . Html::encode($label)
+                  . '</label><br>';
+              },
+              'unselect' => null,
+              ]
+          )->label(false) ?>
+      </div>
+
+      <h4 class="head-card">Дополнительно</h4>
+        <?= $form->field($filters, 'notTaken')->checkbox([
+          'template' => '<label class="control-label">{input} Без исполнителя</label>',
+        ])->label(false) ?>
+
+      <h4 class="head-card">Период</h4>
+      <div class="form-group">
+        <?= $form->field($filters, 'timePeriod')
+          ->dropDownList([
+            '' => 'Любой',
+            1 => '1 час',
+            12 => '12 часов',
+            24 => '24 часа',
+          ], [
+            'id' => 'period-value',
+          ])
+          ->label(false) ?>
+      </div>
+
+     <input type="submit" class="button button--blue" value="Искать">
+
+      <?php ActiveForm::end(); ?>
+
       </div>
     </div>
   </div>

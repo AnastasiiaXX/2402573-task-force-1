@@ -29,7 +29,6 @@ use Yii;
  */
 class Task extends \yii\db\ActiveRecord
 {
-
     /**
      * ENUM field values
      */
@@ -163,15 +162,17 @@ class Task extends \yii\db\ActiveRecord
      * column status ENUM value labels
      * @return string[]
      */
-    public static function optsStatus()
+    public function optsStatus()
     {
-        return [
-            self::STATUS_NEW => 'new',
-            self::STATUS_IN_PROGRESS => 'in_progress',
-            self::STATUS_COMPLETED => 'completed',
-            self::STATUS_CANCELED => 'canceled',
-            self::STATUS_FAILED => 'failed',
+        $labels = [
+            self::STATUS_NEW => 'Новое',
+            self::STATUS_IN_PROGRESS => 'В работе',
+            self::STATUS_COMPLETED => 'Завершено',
+            self::STATUS_CANCELED => 'Отменено',
+            self::STATUS_FAILED => 'Провалено',
         ];
+
+        return $labels[$this->status] ?? $this->status;
     }
 
     /**

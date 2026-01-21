@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 
-class m260108_203009_add_failed_tasks_to_users extends Migration
+class m260120_102426_add_address_field extends Migration
 {
     /**
      * {@inheritdoc}
@@ -10,9 +10,9 @@ class m260108_203009_add_failed_tasks_to_users extends Migration
     public function safeUp()
     {
         $this->addColumn(
-            'users',
-            'failed_tasks',
-            $this->integer()->notNull()->defaultValue(0)
+            'tasks',
+            'address',
+            $this->string()->null()->after('location_id')
         );
     }
 
@@ -21,7 +21,7 @@ class m260108_203009_add_failed_tasks_to_users extends Migration
      */
     public function safeDown()
     {
-         $this->dropColumn('users', 'failed_tasks');
+        $this->dropColumn('tasks', 'address');
     }
 
     /*
@@ -33,7 +33,7 @@ class m260108_203009_add_failed_tasks_to_users extends Migration
 
     public function down()
     {
-        echo "m260108_203009_add_failed_tasks_to_users cannot be reverted.\n";
+        echo "m260120_102426_add_address_field cannot be reverted.\n";
 
         return false;
     }

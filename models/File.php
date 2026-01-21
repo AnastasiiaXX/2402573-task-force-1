@@ -15,8 +15,6 @@ use Yii;
  */
 class File extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -35,7 +33,9 @@ class File extends \yii\db\ActiveRecord
             [['path'], 'required'],
             [['task_id'], 'integer'],
             [['path'], 'string', 'max' => 255],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
+            [['task_id'], 'exist', 'skipOnError' => true,
+            'targetClass' => Task::class,
+            'targetAttribute' => ['task_id' => 'id']],
         ];
     }
 
@@ -60,5 +60,4 @@ class File extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
-
 }

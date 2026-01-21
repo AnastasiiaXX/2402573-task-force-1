@@ -9,7 +9,7 @@ class m260118_012048_add_status_to_users_table extends Migration
      */
     public function safeUp()
     {
-      $this->addColumn('users', 'status', $this->string(20)->notNull()->defaultValue('free')->after('created_at'));
+        $this->addColumn('users', 'status', $this->string(20)->notNull()->defaultValue('free')->after('created_at'));
     }
 
     /**

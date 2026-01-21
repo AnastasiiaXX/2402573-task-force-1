@@ -17,8 +17,6 @@ use Yii;
  */
 class Location extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -72,5 +70,4 @@ class Location extends \yii\db\ActiveRecord
     {
         return $this->hasMany(User::class, ['location_id' => 'id']);
     }
-
 }
