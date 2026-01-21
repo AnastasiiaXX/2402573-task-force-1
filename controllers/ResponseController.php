@@ -9,14 +9,14 @@ use yii\web\ForbiddenHttpException;
 use yii\filters\AccessControl;
 use app\models\Task;
 use app\models\Response;
-
+use app\services\TaskService;
 
 class ResponseController extends Controller
 {
-  public function behaviors()
-  {
-    return [
-      'access' => [
+    public function behaviors()
+    {
+        return [
+        'access' => [
         'class' => AccessControl::class,
         'only' => ['create', 'accept', 'reject'],
         'rules' => [
@@ -31,96 +31,65 @@ class ResponseController extends Controller
             'roles' => ['customer'],
           ],
         ],
-      ],
-    ];
-  }
-
-  public function actionReject($id)
-  {
-    $response = Response::findOne($id);
-
-    if (!$response) {
-      throw new NotFoundHttpException();
+        ],
+        ];
     }
 
-    $task = $response->task;
-    $currentUserId = Yii::$app->user->getId();
 
-    if ((int)$task->employer_id !== (int)$currentUserId) {
-      throw new ForbiddenHttpException();
+    public function actionAccept($id)
+    {
+        $response = Response::findOne($id);
+        if (!$response) {
+            throw new NotFoundHttpException();
+        }
+
+        if ((int)$response->task->employer_id !== (int)Yii::$app->user->id) {
+            throw new ForbiddenHttpException();
+        }
+
+        $service = new TaskService();
+        $service->acceptResponse($response);
+
+        return $this->redirect(['tasks/view', 'id' => $response->task_id]);
     }
 
-    $response->status = Response::STATUS_REJECTED;
-    $response->save(false);
+    public function actionCreate($taskId)
+    {
+        $task = Task::findOne($taskId);
 
-    return $this->redirect(['tasks/view', 'id' => $task->id]);
-  }
+        if (!$task || $task->status !== Task::STATUS_NEW) {
+            throw new ForbiddenHttpException();
+        }
 
-  public function actionAccept($id)
-  {
-    $response = Response::findOne($id);
 
-    if (!$response) {
-      throw new NotFoundHttpException();
-    }
+        $workerId = Yii::$app->user->id;
 
-    $task = $response->task;
-    $currentUserId = Yii::$app->user->getId();
-
-    if ((int)$task->employer_id !== (int)$currentUserId) {
-      throw new ForbiddenHttpException();
-    }
-
-    if ($task->status !== Task::STATUS_NEW) {
-      throw new ForbiddenHttpException();
-    }
-
-    $response->status = Response::STATUS_ACCEPTED;
-    $task->worker_id = $response->worker_id;
-    $task->status = Task::STATUS_IN_PROGRESS;
-
-    $response->save(false);
-    $task->save(false);
-
-    return $this->redirect(['tasks/view', 'id' => $task->id]);
-  }
-
-  public function actionCreate($taskId)
-  {
-    $task = Task::findOne($taskId);
-
-    if (!$task || $task->status !== Task::STATUS_NEW) {
-      throw new ForbiddenHttpException();
-    }
-
-    $workerId = Yii::$app->user->id;
-
-    $alreadyExists = Response::find()
-      ->where([
+        $alreadyExists = Response::find()
+        ->where([
         'task_id' => $taskId,
         'worker_id' => $workerId
-      ])
-      ->exists();
+        ])
+        ->exists();
 
-    if ($alreadyExists) {
-      return $this->redirect(['tasks/view', 'id' => $taskId]);
-    }
+        if ($alreadyExists) {
+            return $this->redirect(['tasks/view', 'id' => $taskId]);
+        }
 
-    $response = new Response();
+        $response = new Response();
 
-    if ($response->load(Yii::$app->request->post())) {
-      $response->task_id = $taskId;
-      $response->worker_id = $workerId;
-      $response->status = Response::STATUS_NEW;
-      $response->date_add = date('Y-m-d H:i:s');
+        if ($response->load(Yii::$app->request->post())) {
+            $response->task_id = $taskId;
+            $response->worker_id = $workerId;
+            $response->status = Response::STATUS_NEW;
+            $response->date_add = date('Y-m-d H:i:s');
 
-      if ($response->cost !== null && $response->cost <= 0) {
+            if ($response->cost !== null && $response->cost <= 0) {
+                return $this->redirect(['tasks/view', 'id' => $taskId]);
+            }
+
+            $response->save(false);
+        }
+
         return $this->redirect(['tasks/view', 'id' => $taskId]);
-      }
-
-      $response->save(false);
     }
-
-    return $this->redirect(['tasks/view', 'id' => $taskId]);
-  }
 }

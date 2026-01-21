@@ -76,7 +76,7 @@ class Task
      */
     public function getAvailableAction(Status $status, int $userId): array
     {
-        if($userId <= 0) {
+        if ($userId <= 0) {
             throw new TaskException('User ID must be a positive integer');
         }
         switch ($status) {

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace TaskForce\utils;
@@ -6,7 +7,8 @@ namespace TaskForce\utils;
 use SplFileObject;
 use Exception;
 
-class CsvToSqlConverter {
+class CsvToSqlConverter
+{
     public function convert(string $sourcePath, string $outPath, array $columns): void
     {
         $fileObject = new SplFileObject($sourcePath);
@@ -14,10 +16,10 @@ class CsvToSqlConverter {
         $sql = '';
         $columnsString = (implode(', ', $columns));
 
-        while(!$fileObject->eof()) {
+        while (!$fileObject->eof()) {
             $csvString = $fileObject->fgetcsv();
 
-           if($fileObject->key() == 0 || $csvString == null || $csvString === [null]) {
+            if ($fileObject->key() == 0 || $csvString == null || $csvString === [null]) {
                 continue;
             }
 

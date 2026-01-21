@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 
@@ -12,58 +13,63 @@ $categoryItems = ArrayHelper::map($categories, 'id', 'title');
   href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.9/dist/css/autoComplete.min.css">
 
 <main class="main-content main-content--center container">
-    <div class="add-task-form regular-form">
+  <div class="add-task-form regular-form">
 
     <?php $form = ActiveForm::begin([
-        'options' => ['enctype' => 'multipart/form-data']
-      ]); ?>
+      'options' => ['enctype' => 'multipart/form-data']
+    ]); ?>
 
-      <h3 class="head-main head-main">Публикация нового задания</h3>      
-      <div class="form-group">
-        <?= $form->field($model, 'title')->textInput()->label('Опишите суть работы') ?>
-      </div>
+    <h3 class="head-main head-main">Публикация нового задания</h3>
+    <div class="form-group">
+      <?= $form->field($model, 'title')->textInput()->label('Опишите суть работы') ?>
+    </div>
 
-      <div class="form-group">
-        <?= $form->field($model, 'description')->textarea()->label('Подробности задания') ?>
-      </div>
+    <div class="form-group">
+      <?= $form->field($model, 'description')->textarea()->label('Подробности задания') ?>
+    </div>
 
-      <div class="form-group">
-        <?= $form->field($model, 'category_id')->dropDownList(
-          $categoryItems, ['prompt' => 'Выберите категорию']
-        )->label('Категория') ?>
-      </div>
+    <div class="form-group">
+      <?= $form->field($model, 'category_id')->dropDownList(
+          $categoryItems,
+          ['prompt' => 'Выберите категорию']
+      )->label('Категория') ?>
+    </div>
 
-      <div class="form-group">
+    <div class="form-group">
       <?= $form->field($model, 'location')
         ->textInput(['class' => 'location-icon', 'id' => 'location-input'])
         ->label('Локация') ?>
     </div>
     <?= $form->field($model, 'latitude')->hiddenInput(['id' => 'location-lat'])->label(false) ?>
     <?= $form->field($model, 'longitude')->hiddenInput(['id' => 'location-lng'])->label(false) ?>
+    <?= $form->field($model, 'city')->hiddenInput()->label(false) ?>
+    <?= $form->field($model, 'address')->hiddenInput()->label(false) ?>
 
-
-      <div class="half-wrapper">
-        <div class="form-group">
-        <?= $form->field($model, 'cost')->textInput(['class' => 'budget-icon'])->label('Бюджет') ?>  
-        </div>
-        <div class="form-group">
-        <?= $form->field($model, 'date_end')->input('date')->label('Срок исполнения') ?>  
-        </div>
-      </div>
-
-      <p class="form-label">Файлы</p>
+    <div class="half-wrapper">
       <div class="form-group">
-          <?= $form->field($model, 'files[]')->fileInput((['multiple' => true]))->label(false) ?>
+        <?= $form->field($model, 'cost')->textInput(['class' => 'budget-icon'])->label('Бюджет') ?>
       </div>
-          <input type="submit" class="button button--blue" value="Опубликовать">
-        <?php ActiveForm::end() ?>
-
+      <div class="form-group">
+        <?= $form->field($model, 'date_end')->input('date')->label('Срок исполнения') ?>
+      </div>
     </div>
+
+    <p class="form-label">Файлы</p>
+    <div class="form-group">
+      <?= $form->field($model, 'files[]')->fileInput((['multiple' => true]))->label(false) ?>
+    </div>
+    <input type="submit" class="button button--blue" value="Опубликовать">
+    <?php ActiveForm::end() ?>
+
+  </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.9/dist/autoComplete.min.js"></script>
 <script>
-  
+  function extractCity(label) {
+    const parts = label.split(',').map(p => p.trim());
+    return parts.at(-3) || null;
+  }
   const autoCompleteJS = new autoComplete({
     selector: "#location-input",
     threshold: 2,
@@ -81,6 +87,7 @@ $categoryItems = ArrayHelper::map($categories, 'id', 'title');
       highlight: true
     },
 
+
     events: {
       input: {
         selection: (event) => {
@@ -89,6 +96,9 @@ $categoryItems = ArrayHelper::map($categories, 'id', 'title');
           autoCompleteJS.input.value = selection.label;
           document.getElementById("location-lat").value = selection.latitude;
           document.getElementById("location-lng").value = selection.longitude;
+
+          document.querySelector('[name="AddTaskForm[city]"]').value = selection.city;
+          document.querySelector('[name="AddTaskForm[address]"]').value = selection.label;
         }
       }
     }

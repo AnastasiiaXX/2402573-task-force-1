@@ -9,7 +9,7 @@ class m260118_011454_add_created_at_to_users_table extends Migration
      */
     public function safeUp()
     {
-      $this->addColumn('users', 'created_at', $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->after('avatar'));
+        $this->addColumn('users', 'created_at', $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->after('avatar'));
     }
 
     /**

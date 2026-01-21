@@ -1,9 +1,11 @@
 <?php
+
 namespace TaskForce\Action;
 
 use TaskForce\Enum\Status;
 
-class Complete extends AbstractAction {
+class Complete extends AbstractAction
+{
     public function getName(): string
     {
         return 'Complete';
@@ -14,7 +16,8 @@ class Complete extends AbstractAction {
         return 'Завершить';
     }
 
-    public function checkRights(int $workerId, int $clientId, int $userId): bool {
+    public function checkRights(int $workerId, int $clientId, int $userId): bool
+    {
         return $userId === $clientId || $userId === $workerId;
     }
 

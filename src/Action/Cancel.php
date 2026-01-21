@@ -1,9 +1,11 @@
 <?php
+
 namespace TaskForce\Action;
 
 use TaskForce\Enum\Status;
 
-class Cancel extends AbstractAction {
+class Cancel extends AbstractAction
+{
     public function getName(): string
     {
         return 'Cancel';
@@ -14,7 +16,8 @@ class Cancel extends AbstractAction {
         return 'Отменить';
     }
 
-    public function checkRights(int $workerId, int $clientId, int $userId): bool {
+    public function checkRights(int $workerId, int $clientId, int $userId): bool
+    {
         return $userId === $clientId;
     }
 
