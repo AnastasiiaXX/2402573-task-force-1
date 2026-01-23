@@ -5,17 +5,29 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 
+/**
+ * Form model for changing a password
+ *
+ * @property string $currentPassword
+ * @property string $newPassword
+ * @property string $newPasswordRepeat
+ *
+ */
 class ChangePasswordForm extends Model
 {
     public $currentPassword;
     public $newPassword;
     public $newPasswordRepeat;
 
-    public function rules()
+    /**
+     * @return array validation rules for model attributes
+     */
+    public function rules(): array
     {
         return [
         [['currentPassword', 'newPassword', 'newPasswordRepeat'], 'required'],
-        ['currentPassword', function ($attribute, $params) {
+        ['currentPassword', function (string $attribute, ?array $params) {
+                /** @var \app\models\User $user */
                 $user = Yii::$app->user->identity;
             if (!$user || !Yii::$app->security->validatePassword($this->$attribute, $user->password)) {
                 $this->addError($attribute, 'Старый пароль введён неверно');
@@ -29,21 +41,30 @@ class ChangePasswordForm extends Model
     }
 
   /**
-     * change user password
-     * @return bool
+     * Changes user password
+     * 
+     * @return bool determines if the password was changed successfully
      */
-    public function changePassword()
+    public function changePassword(): bool
     {
         if (!$this->validate()) {
             return false;
         }
         /** @var \app\models\User $user */
         $user = Yii::$app->user->identity;
+
+        if (!$user) {
+          return false;
+        }
+
         $user->password = Yii::$app->security->generatePasswordHash($this->newPassword);
         return $user->save(false);
     }
 
-    public function attributeLabels()
+    /**
+     * @return array customized attribute labels (name => label)
+     */
+    public function attributeLabels(): array
     {
         return [
 

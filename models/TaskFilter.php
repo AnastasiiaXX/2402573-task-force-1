@@ -4,13 +4,24 @@ namespace app\models;
 
 use yii\base\Model;
 
+/**
+ * TaskFilter is the model for filter form.
+
+ * @property array $categories
+ * @property string $timePeriod
+ * @property bool $notTaken
+ * 
+ */
 class TaskFilter extends Model
 {
     public $categories = [];
     public $notTaken = false;
     public $timePeriod = '';
 
-    public function rules()
+    /**
+   * @return array the validation rules.
+   */
+    public function rules(): array
     {
         return [
             ['categories', 'each', 'rule' => ['integer']],
@@ -19,7 +30,10 @@ class TaskFilter extends Model
         ];
     }
 
-    public function attributeLabels()
+    /**
+     * @return array customized attribute labels (name => label)
+     */
+    public function attributeLabels(): array
     {
         return [
         'categories' => 'Категории',

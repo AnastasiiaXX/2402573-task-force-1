@@ -3,14 +3,21 @@
 namespace app\controllers;
 
 use yii;
-use yii\web\Controller;
 use app\models\User;
+use yii\web\Controller;
+use yii\web\Response;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
-
+/**
+ * Controller for displaying user profiles.
+ */
 class UsersController extends Controller
-{
-    public function behaviors()
+{   
+  /**
+     * {@inheritdoc}
+     * @return array
+     */
+    public function behaviors(): array
     {
         return [
         'access' => [
@@ -31,8 +38,14 @@ class UsersController extends Controller
         ],
         ];
     }
-
-    public function actionView($id)
+    /**
+     * Displays a worker's profile
+     * @param int $id the user id
+     * @return string
+     * 
+     * @throws NotFoundHttpException if the user does not exist or not a worker
+     */
+    public function actionView(int $id): string
     {
         $user = User::findOne($id);
         if (!$user) {
@@ -47,8 +60,11 @@ class UsersController extends Controller
 
         return $this->render('view', ['user' => $user]);
     }
-
-    public function actionLogout()
+    /**
+     * Logs out of the profile
+     * * @return Response
+     */
+    public function actionLogout(): Response
     {
         \Yii::$app->user->logout();
 

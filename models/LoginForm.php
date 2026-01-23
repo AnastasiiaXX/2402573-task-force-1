@@ -22,7 +22,7 @@ class LoginForm extends Model
   /**
    * @return array the validation rules.
    */
-    public function rules()
+    public function rules(): array
     {
         return [
         [['email', 'password'], 'required'],
@@ -37,7 +37,7 @@ class LoginForm extends Model
    *
    * @return User|null
    */
-    public function getUser()
+    public function getUser(): User|null 
     {
         if ($this->_user === null) {
             $this->_user = User::findOne(['email' => $this->email]);
@@ -51,9 +51,9 @@ class LoginForm extends Model
    * This method serves as the inline validation for password.
    *
    * @param string $attribute the attribute currently being validated
-   * @param array $params the additional name-value pairs given in the rule
+   * @param array|null $params the additional name-value pairs given in the rule
    */
-    public function validatePassword($attribute, $params)
+    public function validatePassword(string $attribute, ?array $params): void
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
@@ -64,7 +64,10 @@ class LoginForm extends Model
         }
     }
 
-    public function attributeLabels()
+    /**
+     * @return array customized attribute labels (name => label)
+     */
+    public function attributeLabels(): array
     {
         return [
         'email' => 'Email',

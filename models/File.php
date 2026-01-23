@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "files".
@@ -11,14 +13,14 @@ use Yii;
  * @property string $path
  * @property int|null $task_id
  *
- * @property Tasks $task
+ * @property Task $task
  */
-class File extends \yii\db\ActiveRecord
+class File extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'files';
     }
@@ -26,7 +28,7 @@ class File extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['task_id'], 'default', 'value' => null],
@@ -42,7 +44,7 @@ class File extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -52,11 +54,11 @@ class File extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Task]].
+     * Gets query for files of the chosen task.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTask()
+    public function getTask(): ActiveQuery
     {
         return $this->hasOne(Task::class, ['id' => 'task_id']);
     }

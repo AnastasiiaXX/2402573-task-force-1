@@ -6,6 +6,18 @@ use app\models\User;
 use app\models\Location;
 use yii\base\Model;
 
+/**
+ * SignUpForm is the model behind the sign up form.
+ * @property-read User|null $user
+ * @property-read Location|null $location_id
+ * @property string $name
+ * @property string $email
+ * @property int $location_id
+ * @property string $password
+ * @property string $password_retype
+ * @property bool $willRespond
+ * 
+ */
 class SignUpForm extends Model
 {
     public $name;
@@ -15,7 +27,10 @@ class SignUpForm extends Model
     public $password_retype;
     public $willRespond;
 
-    public function rules()
+    /**
+   * @return array the validation rules.
+   */
+    public function rules(): array
     {
           return [
               [['name'], 'string', 'max' => 85],
@@ -45,7 +60,10 @@ class SignUpForm extends Model
           ];
     }
 
-    public function attributeLabels()
+    /**
+     * @return array customized attribute labels (name => label)
+     */
+    public function attributeLabels(): array
     {
         return [
             'email' => 'Электронная почта',

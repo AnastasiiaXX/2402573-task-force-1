@@ -4,14 +4,22 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\Controller;
+use yii\web\Response;
 use yii\filters\AccessControl;
 use app\models\User;
 use app\models\Location;
 use app\models\SignUpForm;
 
+/**
+ * Controller for user registration
+ */
 class SignUpController extends Controller
 {
-    public function behaviors()
+     /**
+     * {@inheritdoc}
+     * @return array
+     */
+    public function behaviors(): array
     {
         return [
         'access' => [
@@ -25,7 +33,12 @@ class SignUpController extends Controller
         ],
         ];
     }
-    public function actionIndex()
+
+    /**
+     * Handles user registration
+     * @return string|Response
+     */
+    public function actionIndex(): string|Response
     {
 
         if (!Yii::$app->user->isGuest) {

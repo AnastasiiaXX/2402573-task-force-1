@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "locations".
@@ -12,15 +14,15 @@ use Yii;
  * @property float $latitude
  * @property float $longitude
  *
- * @property Tasks[] $tasks
- * @property Users[] $users
+ * @property Task[] $tasks
+ * @property User[] $users
  */
-class Location extends \yii\db\ActiveRecord
+class Location extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'locations';
     }
@@ -28,7 +30,7 @@ class Location extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'latitude', 'longitude'], 'required'],
@@ -41,7 +43,7 @@ class Location extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -52,21 +54,21 @@ class Location extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Tasks]].
+     * Gets query for tasks with this location.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTasks()
+    public function getTasks(): ActiveQuery
     {
         return $this->hasMany(Task::class, ['location_id' => 'id']);
     }
 
     /**
-     * Gets query for [[Users]].
+     * Gets query for users with this location.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getUsers()
+    public function getUsers(): ActiveQuery
     {
         return $this->hasMany(User::class, ['location_id' => 'id']);
     }

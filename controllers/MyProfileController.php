@@ -2,20 +2,24 @@
 
 namespace app\controllers;
 
-use app\models\Category;
 use Yii;
 use yii\web\Controller;
 use yii\web\UploadedFile;
+use yii\web\Response;
 use yii\web\ForbiddenHttpException;
 use yii\helpers\ArrayHelper;
 use app\models\User;
-use app\models\Specialty;
+use app\models\Category;
 use app\models\ChangePasswordForm;
 use yii\filters\AccessControl;
 
 class MyProfileController extends Controller
 {
-    public function behaviors()
+    /**
+     * {@inheritdoc}
+     * @return array
+     */
+    public function behaviors(): array
     {
         return [
         'access' => [
@@ -30,7 +34,12 @@ class MyProfileController extends Controller
         ];
     }
 
-    public function actionIndex()
+    /**
+     * Displays the form for editing a worker's profile
+     * @return string|Response
+     * @throws ForbiddenHttpException if user is not a worker
+     */
+    public function actionIndex(): string|Response
     {
       /** @var User $model */
         $model = Yii::$app->user->identity;
@@ -83,7 +92,11 @@ class MyProfileController extends Controller
         ]);
     }
 
-    public function actionSecurity()
+    /**
+     * Displays the form for changing worker's password
+     * @return string|Response
+     */
+    public function actionSecurity(): string|Response
     {
         $passwordForm = new ChangePasswordForm();
 

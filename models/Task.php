@@ -2,7 +2,8 @@
 
 namespace app\models;
 
-use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "tasks".
@@ -19,15 +20,15 @@ use Yii;
  * @property int|null $location_id
  * @property int|null $category_id
  *
- * @property Categories $category
- * @property Users $employer
- * @property Files[] $files
- * @property Locations $location
- * @property Responses[] $responses
- * @property Reviews[] $reviews
- * @property Users $worker
+ * @property Category $category
+ * @property User $employer
+ * @property File[] $files
+ * @property Location $location
+ * @property Response[] $responses
+ * @property Review[] $reviews
+ * @property User $worker
  */
-class Task extends \yii\db\ActiveRecord
+class Task extends ActiveRecord
 {
     /**
      * ENUM field values
@@ -41,7 +42,7 @@ class Task extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'tasks';
     }
@@ -49,7 +50,7 @@ class Task extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['cost', 'date_end', 'worker_id', 'location_id', 'category_id'], 'default', 'value' => null],
@@ -70,7 +71,7 @@ class Task extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -90,9 +91,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Category]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCategory()
+    public function getCategory(): ActiveQuery
     {
         return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
@@ -100,9 +101,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Employer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getEmployer()
+    public function getEmployer(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'employer_id']);
     }
@@ -110,9 +111,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Files]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getFiles()
+    public function getFiles(): ActiveQuery
     {
         return $this->hasMany(File::class, ['task_id' => 'id']);
     }
@@ -120,9 +121,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Location]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getLocation()
+    public function getLocation(): ActiveQuery
     {
         return $this->hasOne(Location::class, ['id' => 'location_id']);
     }
@@ -130,9 +131,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Responses]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getResponses()
+    public function getResponses(): ActiveQuery
     {
         return $this->hasMany(Response::class, ['task_id' => 'id']);
     }
@@ -140,9 +141,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Reviews]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getReviews()
+    public function getReviews(): ActiveQuery
     {
         return $this->hasMany(Review::class, ['task_id' => 'id']);
     }
@@ -150,48 +151,49 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Worker]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getWorker()
+    public function getWorker(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'worker_id']);
     }
 
 
     /**
-     * column status ENUM value labels
-     * @return string[]
+     * Returns the list of all available task statuses and their labels
+     * @return array<string, string> status values and their human-readable labels
      */
-    public function optsStatus()
+    public static function optsStatus(): array
     {
-        $labels = [
+        return [
             self::STATUS_NEW => 'Новое',
             self::STATUS_IN_PROGRESS => 'В работе',
             self::STATUS_COMPLETED => 'Завершено',
             self::STATUS_CANCELED => 'Отменено',
             self::STATUS_FAILED => 'Провалено',
         ];
-
-        return $labels[$this->status] ?? $this->status;
     }
 
     /**
+     * Returns the label of the current task status
+     * 
      * @return string
      */
-    public function displayStatus()
+    public function displayStatus(): string
     {
-        return self::optsStatus()[$this->status];
+        $statuses = self::optsStatus();
+        return $statuses[$this->status] ?? $this->status;
     }
 
     /**
      * @return bool
      */
-    public function isStatusNew()
+    public function isStatusNew(): bool
     {
         return $this->status === self::STATUS_NEW;
     }
 
-    public function setStatusToNew()
+    public function setStatusToNew(): void
     {
         $this->status = self::STATUS_NEW;
     }
@@ -199,12 +201,12 @@ class Task extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isStatusInprogress()
+    public function isStatusInprogress(): bool
     {
         return $this->status === self::STATUS_IN_PROGRESS;
     }
 
-    public function setStatusToInprogress()
+    public function setStatusToInprogress(): void
     {
         $this->status = self::STATUS_IN_PROGRESS;
     }
@@ -212,12 +214,12 @@ class Task extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isStatusCompleted()
+    public function isStatusCompleted(): bool
     {
         return $this->status === self::STATUS_COMPLETED;
     }
 
-    public function setStatusToCompleted()
+    public function setStatusToCompleted(): void
     {
         $this->status = self::STATUS_COMPLETED;
     }
@@ -225,12 +227,12 @@ class Task extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isStatusCanceled()
+    public function isStatusCanceled(): bool
     {
         return $this->status === self::STATUS_CANCELED;
     }
 
-    public function setStatusToCanceled()
+    public function setStatusToCanceled(): void
     {
         $this->status = self::STATUS_CANCELED;
     }
@@ -238,12 +240,12 @@ class Task extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isStatusFailed()
+    public function isStatusFailed(): bool
     {
         return $this->status === self::STATUS_FAILED;
     }
 
-    public function setStatusToFailed()
+    public function setStatusToFailed(): void
     {
         $this->status = self::STATUS_FAILED;
     }

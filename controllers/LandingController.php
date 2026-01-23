@@ -6,13 +6,22 @@ use Yii;
 use app\models\LoginForm;
 use app\models\User;
 use yii\web\Controller;
+use yii\web\Response;
 use yii\filters\AccessControl;
+use yii\authclient\ClientInterface;
 
+/**
+ * Controller for handling authorization either regular or via the third party
+ */
 class LandingController extends Controller
 {
     public $layout = 'landing';
 
-    public function behaviors()
+    /**
+     * {@inheritdoc}
+     * @return array
+     */
+    public function behaviors(): array
     {
         return [
         'access' => [
@@ -26,8 +35,11 @@ class LandingController extends Controller
         ],
         ];
     }
-
-    public function actionIndex()
+    /**
+     * Displays the login form
+     * @return string|Response
+     */
+    public function actionIndex(): string|Response
     {
         $loginForm = new LoginForm();
 
@@ -56,7 +68,7 @@ class LandingController extends Controller
   /**
    * {@inheritdoc}
    */
-    public function actions()
+    public function actions(): array
     {
 
         return [
@@ -66,8 +78,12 @@ class LandingController extends Controller
         ],
         ];
     }
-
-    public function onAuthSuccess($client)
+    /**
+     * Handles successful authorization via third-party services.
+     * @param ClientInterface $client
+     * @return array
+     */
+    public function onAuthSuccess(ClientInterface $client): Response
     {
         $attributes = $client->getUserAttributes();
 

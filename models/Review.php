@@ -2,8 +2,8 @@
 
 namespace app\models;
 
-use Yii;
-
+use yii\db\ActiveRecord;
+use \yii\db\ActiveQuery;
 /**
  * This is the model class for table "reviews".
  *
@@ -15,15 +15,16 @@ use Yii;
  * @property int|null $worker_id
  * @property int|null $task_id
  *
- * @property Tasks $task
- * @property Users $worker
+ * @property Task $task
+ * @property User $worker
+ * @property User $employer
  */
-class Review extends \yii\db\ActiveRecord
+class Review extends ActiveRecord
 {
   /**
    * {@inheritdoc}
    */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'reviews';
     }
@@ -31,7 +32,7 @@ class Review extends \yii\db\ActiveRecord
   /**
    * {@inheritdoc}
    */
-    public function rules()
+    public function rules(): array
     {
         return [
         [['employer_id', 'worker_id', 'task_id'], 'default', 'value' => null],
@@ -54,7 +55,7 @@ class Review extends \yii\db\ActiveRecord
   /**
    * {@inheritdoc}
    */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
         'text' => 'Комментарий',
@@ -65,9 +66,9 @@ class Review extends \yii\db\ActiveRecord
   /**
    * Gets query for [[Task]].
    *
-   * @return \yii\db\ActiveQuery
+   * @return ActiveQuery
    */
-    public function getTask()
+    public function getTask(): ActiveQuery
     {
         return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
@@ -75,19 +76,19 @@ class Review extends \yii\db\ActiveRecord
   /**
    * Gets query for [[Worker]].
    *
-   * @return \yii\db\ActiveQuery
+   * @return ActiveQuery
    */
-    public function getWorker()
+    public function getWorker(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'worker_id']);
     }
 
   /**
- * Получить заказчика (автора отзыва)
+ * Gets query for [[Employer]].
  *
- * @return \yii\db\ActiveQuery
+ * @return ActiveQuery
  */
-    public function getEmployer()
+    public function getEmployer(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'employer_id']);
     }
