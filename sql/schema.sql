@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS task_force
 	DEFAULT CHARACTER SET utf8mb4
 	DEFAULT COLLATE utf8mb4_general_ci;
+  
 USE task_force;
 
 CREATE TABLE specialties (
@@ -55,14 +56,14 @@ CREATE TABLE tasks (
   FOREIGN KEY (employer_id) REFERENCES users(id),
   FOREIGN KEY (worker_id) REFERENCES users(id),
   FOREIGN KEY (location_id) REFERENCES locations(id),
-  FOREIGN KEY (category_id) REFERENCES categories(id),
+  FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
 CREATE TABLE files (
 	id INT PRIMARY KEY AUTO_INCREMENT,
   path VARCHAR(255) NOT NULL,
   task_id INT,
-  FOREIGN KEY (task_id) REFERENCES tasks(id);
+  FOREIGN KEY (task_id) REFERENCES tasks(id)
 );
 
 CREATE TABLE responses (
@@ -72,8 +73,8 @@ CREATE TABLE responses (
   comment TEXT,
   worker_id INT,
   task_id INT,
-  FOREIGN KEY (task_id) REFERENCES tasks(id);
-  FOREIGN KEY (worker_id) REFERENCES users(id);
+  FOREIGN KEY (task_id) REFERENCES tasks(id),
+  FOREIGN KEY (worker_id) REFERENCES users(id)
 );
 
 CREATE TABLE reviews (
@@ -84,6 +85,6 @@ CREATE TABLE reviews (
   employer_id INT,
   worker_id INT,
   task_id INT,
-  FOREIGN KEY (task_id) REFERENCES tasks(id);
-  FOREIGN KEY (worker_id) REFERENCES users(id);
+  FOREIGN KEY (task_id) REFERENCES tasks(id),
+  FOREIGN KEY (worker_id) REFERENCES users(id)
 );
