@@ -5,6 +5,21 @@ namespace app\models;
 use yii\base\Model;
 use app\models\Category;
 
+/**
+ * Form model for adding a new task.
+ * * @property string $title
+ * @property int $category_id
+ * @property string $description
+ * @property UploadedFile[] $files
+ * @property int|string $cost
+ * @property string $date_end
+ * @property string $location
+ * @property string $address
+ * @property string $city
+ * @property float $latitude
+ * @property float $longitude
+ */
+
 class AddTaskForm extends Model
 {
     public $title = '';
@@ -20,7 +35,11 @@ class AddTaskForm extends Model
     public $latitude;
     public $longitude;
 
-    public function rules()
+
+    /**
+     * @return array validation rules for model attributes
+     */
+    public function rules(): array
     {
         return [
         [['title', 'description', 'category_id'], 'required'],
@@ -47,14 +66,26 @@ class AddTaskForm extends Model
         ];
     }
 
-    public function validateDeadline($attribute)
+    
+    /**
+     * Validates end date of a task
+     * * @param string $attribute string being validated
+     * @return void
+     */
+    public function validateDeadline(string $attribute): void
     {
         if ($this->$attribute && strtotime($this->$attribute) < strtotime(date('Y-m-d'))) {
             $this->addError($attribute, 'Дата не может быть раньше текущего дня');
         }
     }
 
-    public function validateMinNonWhitespace($attribute, $params)
+    /**
+     * Validates the minimum number of symbols except white-space characters
+     * * @param string $attribute string being validated
+     * @param array $params any additional parameters from the rule
+     * @return void
+     */
+    public function validateMinNonWhitespace(string $attribute, array $params): void
     {
         $min = $params['min'] ?? 1;
         $text = preg_replace('/\s+/u', '', (string)$this->$attribute);
@@ -64,6 +95,9 @@ class AddTaskForm extends Model
         }
     }
 
+    /**
+     * @return array customized attribute labels (name => label)
+     */
     public function attributeLabels()
     {
         return [

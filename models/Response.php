@@ -2,8 +2,9 @@
 
 namespace app\models;
 
-use Yii;
 use app\models\User;
+use yii\db\ActiveRecord;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "responses".
@@ -16,10 +17,10 @@ use app\models\User;
  * @property int|null $task_id
  * @property string $status
  *
- * @property Tasks $task
+ * @property Task $task
  * @property Users $worker
  */
-class Response extends \yii\db\ActiveRecord
+class Response extends ActiveRecord
 {
     public const STATUS_NEW = 'new';
     public const STATUS_ACCEPTED = 'accepted';
@@ -29,7 +30,7 @@ class Response extends \yii\db\ActiveRecord
   /**
    * {@inheritdoc}
    */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'responses';
     }
@@ -37,7 +38,7 @@ class Response extends \yii\db\ActiveRecord
   /**
    * {@inheritdoc}
    */
-    public function rules()
+    public function rules(): array
     {
         return [
         ['status', 'default', 'value' => self::STATUS_NEW],
@@ -61,7 +62,7 @@ class Response extends \yii\db\ActiveRecord
   /**
    * {@inheritdoc}
    */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
         'cost' => 'Ваша цена',
@@ -72,9 +73,9 @@ class Response extends \yii\db\ActiveRecord
   /**
    * Gets query for [[Task]].
    *
-   * @return \yii\db\ActiveQuery
+   * @return ActiveQuery
    */
-    public function getTask()
+    public function getTask(): ActiveQuery
     {
         return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
@@ -82,9 +83,9 @@ class Response extends \yii\db\ActiveRecord
   /**
    * Gets query for [[Worker]].
    *
-   * @return \yii\db\ActiveQuery
+   * @return ActiveQuery
    */
-    public function getWorker()
+    public function getWorker(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'worker_id']);
     }

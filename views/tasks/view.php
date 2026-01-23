@@ -7,7 +7,7 @@ use app\models\Response;
 use yii\widgets\ActiveForm;
 
 $currentUserId = Yii::$app->user->isGuest ? null : (int)Yii::$app->user->id;
-//$avatarPath = $response->worker->avatar ? '/uploads/' . $response->worker->avatar : '/img/avatars/default-avatar.jpg';
+
 ?>
 <main class="main-content container">
   <div class="left-column">
@@ -92,7 +92,7 @@ $currentUserId = Yii::$app->user->isGuest ? null : (int)Yii::$app->user->id;
         <dt>Срок выполнения</dt>
         <dd><?= $task->date_end ? Yii::$app->formatter->asRelativeTime($task->date_end) : '—' ?></dd>
         <dt>Статус</dt>
-        <dd><?= $task->optsStatus() ?></dd>
+        <dd><?= $task->displayStatus() ?></dd>
       </dl>
     </div>
     <div class="right-card white file-card">

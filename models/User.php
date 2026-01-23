@@ -26,19 +26,19 @@ use yii\base\NotSupportedException;
  * @property int $failed_tasks
  * @property string|null $auth_key
  *
- * @property Categrory[] $categories
+ * @property Category[] $categories
  * @property Location $location
- * @property Responses[] $responses
- * @property Reviews[] $reviews
- * @property Tasks[] $tasks
- * @property Tasks[] $tasks0
+ * @property Response[] $responses
+ * @property Review[] $reviews
+ * @property Task[] $tasks
+ * @property Task[] $tasks0
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-  /** @var mixed Файл аватара для загрузки */
+  /** @var mixed Avatar file for uploading */
     public $avatarFile;
 
-  /** @var array Список выбранных категорий */
+  /** @var array List of chosen categories */
     public $category_ids = [];
 
   /**
@@ -150,9 +150,9 @@ class User extends ActiveRecord implements IdentityInterface
   /**
    * Gets query for [[Location]].
    *
-   * @return \yii\db\ActiveQuery
+   * @return ActiveQuery
    */
-    public function getLocation()
+    public function getLocation(): ActiveQuery
     {
         return $this->hasOne(Location::class, ['id' => 'location_id']);
     }
@@ -160,9 +160,9 @@ class User extends ActiveRecord implements IdentityInterface
   /**
    * Gets query for [[Responses]].
    *
-   * @return \yii\db\ActiveQuery
+   * @return ActiveQuery
    */
-    public function getResponses()
+    public function getResponses(): ActiveQuery
     {
         return $this->hasMany(Response::class, ['worker_id' => 'id']);
     }
@@ -170,9 +170,9 @@ class User extends ActiveRecord implements IdentityInterface
   /**
    * Gets query for [[Reviews]].
    *
-   * @return \yii\db\ActiveQuery
+   * @return ActiveQuery
    */
-    public function getReviews()
+    public function getReviews(): ActiveQuery
     {
         return $this->hasMany(Review::class, ['worker_id' => 'id']);
     }
@@ -180,9 +180,9 @@ class User extends ActiveRecord implements IdentityInterface
   /**
    * Gets query for [[Tasks]].
    *
-   * @return \yii\db\ActiveQuery
+   * @return ActiveQuery
    */
-    public function getTasks()
+    public function getTasks(): ActiveQuery
     {
         return $this->hasMany(Task::class, ['employer_id' => 'id']);
     }
@@ -190,19 +190,28 @@ class User extends ActiveRecord implements IdentityInterface
   /**
    * Gets query for [[Tasks0]].
    *
-   * @return \yii\db\ActiveQuery
+   * @return ActiveQuery
    */
-    public function getTasks0()
+    public function getTasks0(): ActiveQuery
     {
         return $this->hasMany(Task::class, ['worker_id' => 'id']);
     }
 
-    public function getCategories()
+  /**
+   * Gets query for Categories.
+   *
+   * @return ActiveQuery
+   */
+    public function getCategories(): ActiveQuery
     {
         return $this->hasMany(Category::class, ['id' => 'category_id'])
         ->viaTable('user_categories', ['user_id' => 'id']);
     }
 
+  /**
+   * 
+   * @return int the sum of tasks completed
+   */
     public function getCompletedTasksCount(): int
     {
         return $this->getTasks0()
@@ -210,6 +219,10 @@ class User extends ActiveRecord implements IdentityInterface
         ->count();
     }
 
+    /**
+   * 
+   * @return int the sum of tasks failed
+   */
     public function getFailedTasksCount(): int
     {
         return $this->getTasks0()
@@ -218,7 +231,7 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
   /**
-   * Сумма оценок всех отзывов
+   * @return float the sum of all reviews
    */
     public function getReviewsScoreSum(): float
     {
@@ -226,7 +239,8 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
   /**
-   * Количество отзывов
+   * The count of reviews
+   * @return int
    */
     public function getReviewsCount(): int
     {
@@ -234,8 +248,10 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
   /**
-   * Средний рейтинг пользователя по формуле:
-   * сумма всех оценок / (кол-во отзывов + счетчик проваленных заданий)
+   * 
+   * The average rating of the user calculated with the formula below:
+   * the sum of all scores / (the number of all reviews + count of failed tasks)
+   * @return float
    */
     public function getAverageRating(): float
     {
@@ -251,10 +267,11 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
   /**
-   * Позиция пользователя в рейтинге исполнителей
+   * @return int the user position in the rating
    */
     public function getRatingPosition(): int
-    {
+    {   
+      /** @var User[] $users */
         $users = self::find()->all();
 
         usort($users, fn($a, $b) => $b->getAverageRating() <=> $a->getAverageRating());
@@ -268,6 +285,10 @@ class User extends ActiveRecord implements IdentityInterface
         return count($users);
     }
 
+    /**
+     * Checks if the user is available for taking tasks.
+     * @return bool
+     */
     public function isAvailable(): bool
     {
         return !$this->getTasks0()
@@ -275,7 +296,10 @@ class User extends ActiveRecord implements IdentityInterface
         ->exists();
     }
 
-    public function getAge(): int|null
+    /**
+     * @return int|null the age of the user and null if the birthday is not put
+     */
+    public function getAge(): ?int
     {
         if (!$this->birthday) {
             return null;

@@ -7,15 +7,16 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
-
+/**
+ * Main controller of the app
+ */
 class SiteController extends Controller
 {
     /**
      * {@inheritdoc}
+     * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -40,71 +41,36 @@ class SiteController extends Controller
 
     /**
      * {@inheritdoc}
+     * @return array
      */
-    public function actions()
+    public function actions(): array
     {
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
         ];
     }
 
     /**
-     * Displays homepage.
+     * Redirects to the landing page.
      *
-     * @return string
+     * @return Response
      */
-    public function actionIndex()
+    public function actionIndex(): Response
     {
         return $this->redirect(['/landing']);
     }
-
-    // /**
-    //  * Login action.
-    //  *
-    //  * @return Response|string
-    //  */
-    // public function actionLogin()
-    // {
-    //     if (!Yii::$app->user->isGuest) {
-    //         return $this->goHome();
-    //     }
-
-    //     $model = new LoginForm();
-    //     if ($model->load(Yii::$app->request->post()) && $model->login()) {
-    //         return $this->goBack();
-    //     }
-
-    //     $model->password = '';
-    //     return $this->render('login', [
-    //         'model' => $model,
-    //     ]);
-    // }
 
     /**
      * Logout action.
      *
      * @return Response
      */
-    public function actionLogout()
+    public function actionLogout(): Response
     {
         Yii::$app->user->logout();
 
         return $this->goHome();
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
     }
 }

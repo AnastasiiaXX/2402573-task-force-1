@@ -8,9 +8,16 @@ use yii\web\ForbiddenHttpException;
 use yii\filters\AccessControl;
 use app\models\Task;
 
+/**
+ * Controller for managing user's own tasks
+ */
 class MyTasksController extends Controller
 {
-    public function behaviors()
+    /**
+     * {@inheritdoc}
+     * @return array
+     */
+    public function behaviors(): array
     {
         return [
         'access' => [
@@ -24,8 +31,13 @@ class MyTasksController extends Controller
         ],
         ];
     }
-
-    public function actionIndex($status = null)
+    /**
+     * Displays the list of tasks depending on their status and user role
+     * @param string|null @status status filter
+     * @throws ForbiddenHttpException if user is not authorized
+     * @return string
+     */
+    public function actionIndex($status = null): string
     {
         if (Yii::$app->user->isGuest) {
             throw new ForbiddenHttpException('Доступ запрещён');

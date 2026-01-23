@@ -6,6 +6,7 @@ use Yii;
 use yii\web\Controller;
 use yii\web\UploadedFile;
 use yii\web\ForbiddenHttpException;
+use yii\web\Response;
 use app\models\AddTaskForm;
 use app\models\Task;
 use app\models\File;
@@ -13,9 +14,16 @@ use app\models\Category;
 use app\models\Location;
 use yii\filters\AccessControl;
 
+/**
+ * Controller for handling new task creation
+ */
 class AddTaskController extends Controller
 {
-    public function behaviors()
+    /**
+     * {@inheritdoc}
+     * @return array
+     */
+    public function behaviors(): array
     {
         return [
         'access' => [
@@ -29,8 +37,13 @@ class AddTaskController extends Controller
         ],
         ];
     }
-
-    public function actionIndex()
+    
+    /**
+     * Displays the task creation page and handles form submission
+     * @throws ForbiddenHttpException if the user is not a customer
+     * @return string|Response
+     */
+    public function actionIndex(): string|Response
     {
         if (Yii::$app->user->isGuest || !Yii::$app->user->can('customer')) {
             throw new ForbiddenHttpException();
@@ -39,11 +52,6 @@ class AddTaskController extends Controller
         $form = new AddTaskForm();
 
         if ($form->load(Yii::$app->request->post())) {
-            $postData = Yii::$app->request->post();
-            error_log('=== POST DATA ===');
-            error_log(print_r($postData, true));
-            error_log('City from POST: ' . ($postData['AddTaskForm']['city'] ?? 'NOT SET'));
-            error_log('Form city after load: ' . $form->city);
             $form->files = UploadedFile::getInstances($form, 'files');
 
             if ($form->validate()) {
